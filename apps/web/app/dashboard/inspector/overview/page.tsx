@@ -1,7 +1,7 @@
 "use client"
 
 import { PageContainer } from "@/components/layout/page-container"
-import { SharedDashboardContainer } from "@/components/dashboard/shared-dashboard-container"
+import { SystemOverviewDashboard } from "@/components/dashboard/system-overview-dashboard"
 
 export default function InspectorOverviewPage() {
   return (
@@ -14,7 +14,7 @@ export default function InspectorOverviewPage() {
         { label: "Overview", href: "/dashboard/inspector/overview" },
       ]}
     >
-      <SharedDashboardContainer />
+      <SystemOverviewDashboard role="INSPECTOR" />
     </PageContainer>
   )
 }

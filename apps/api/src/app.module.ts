@@ -9,6 +9,7 @@ import { AuthModule } from "./auth/auth.module"
 import { ExtinguishersModule } from "./extinguishers/extinguishers.module"
 import { InspectionsModule } from "./inspections/inspections.module"
 import { PrismaService } from "./prisma.service"
+import { ReportsModule } from "./reports/reports.module"
 import { UsersModule } from "./users/users.module"
 
 @Module({
@@ -33,6 +34,7 @@ import { UsersModule } from "./users/users.module"
     UsersModule,
     ExtinguishersModule,
     InspectionsModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [

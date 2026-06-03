@@ -4,14 +4,10 @@ import * as React from "react"
 import { usePathname, useRouter } from "next/navigation"
 import {
   BarChart3,
-  Bell,
   CalendarCheck,
   ClipboardList,
-  Database,
-  FileSpreadsheet,
   FireExtinguisher,
-  House,
-  PlusCircle,
+  ScrollText,
   UserCircle,
   Users,
 } from "lucide-react"
@@ -24,12 +20,14 @@ const adminNavItems = [
   { id: "users", label: "User Management", href: "/dashboard/admin/users", icon: Users },
   { id: "extinguishers", label: "Fire Extinguishers", href: "/dashboard/admin/extinguishers", icon: FireExtinguisher },
   { id: "inspections", label: "Inspections", href: "/dashboard/admin/inspections", icon: CalendarCheck },
+  { id: "reports", label: "Reports", href: "/dashboard/admin/reports", icon: BarChart3 },
   { id: "profile", label: "Profile", href: "/dashboard/admin/profile", icon: UserCircle },
 ]
 
 const inspectorNavItems = [
   { id: "overview", label: "Overview", href: "/dashboard/inspector/overview", icon: ClipboardList },
   { id: "inspections", label: "My Inspections", href: "/dashboard/inspector/inspections", icon: CalendarCheck },
+  { id: "logs", label: "Maintenance Logs", href: "/dashboard/inspector/logs", icon: ScrollText },
   { id: "profile", label: "Profile", href: "/dashboard/inspector/profile", icon: UserCircle },
 ]
 

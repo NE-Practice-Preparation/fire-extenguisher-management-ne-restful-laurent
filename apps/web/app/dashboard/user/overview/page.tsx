@@ -1,7 +1,7 @@
 "use client"
 
-import { UserDashboardContainer } from "@/components/dashboard/user-dashboard-container"
 import { PrimaryDashboardButton } from "@/components/dashboard/primary-dashboard-button"
+import { SystemOverviewDashboard } from "@/components/dashboard/system-overview-dashboard"
 import { PageContainer } from "@/components/layout/page-container"
 
 
@@ -19,7 +19,7 @@ export default function Role2OverviewPage() {
         { label: "Overview", href: "/dashboard/user/overview" },
       ]}
     >
-      <UserDashboardContainer />
+      <SystemOverviewDashboard role="USER" />
     </PageContainer>
   )
 }
