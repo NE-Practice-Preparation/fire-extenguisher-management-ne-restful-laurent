@@ -30,6 +30,16 @@ export type Inspection = {
   }
   assignedInspector: { id: string; firstName: string; lastName: string } | null
   createdBy: { id: string; firstName: string; lastName: string }
+  maintenanceActivities: MaintenanceActivity[]
+}
+
+export type MaintenanceActivity = {
+  id: string
+  actionsTaken: string
+  actionDate: string
+  conditionsNoted: string
+  createdAt: string
+  inspector: { id: string; firstName: string; lastName: string } | null
 }
 
 export type ListInspectionsParams = {
@@ -69,6 +79,28 @@ export function cancelInspection(token: string, id: string) {
 
 export function getInspection(token: string, id: string) {
   return api<Inspection>(`/inspections/${id}`, { token })
+}
+
+export function assignInspector(token: string, id: string, assignedInspectorId: string) {
+  return api<Inspection>(`/inspections/${id}/assign`, {
+    method: "PATCH",
+    token,
+    body: JSON.stringify({ assignedInspectorId }),
+  })
+}
+
+export type CompleteInspectionInput = {
+  actionsTaken: string
+  actionDate: string
+  conditionsNoted: string
+}
+
+export function completeInspection(token: string, id: string, input: CompleteInspectionInput) {
+  return api<Inspection>(`/inspections/${id}/complete`, {
+    method: "PATCH",
+    token,
+    body: JSON.stringify(input),
+  })
 }
 
 export function statusLabel(status: InspectionStatus) {

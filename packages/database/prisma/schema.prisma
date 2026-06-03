@@ -24,6 +24,7 @@ model User {
 
   createdInspections  Inspection[] @relation("CreatedInspections")
   assignedInspections Inspection[] @relation("AssignedInspections")
+  maintenanceActivities MaintenanceActivity[] @relation("LoggedMaintenanceActivities")
 
   @@index([role])
 }
@@ -67,10 +68,29 @@ model Inspection {
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
 
+  maintenanceActivities MaintenanceActivity[]
+
   @@index([status])
   @@index([extinguisherId])
   @@index([assignedInspectorId])
   @@index([createdById])
+}
+
+model MaintenanceActivity {
+  id              String     @id @default(cuid())
+  inspectionId    String
+  inspection      Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  inspectorId     String?
+  inspector       User?      @relation("LoggedMaintenanceActivities", fields: [inspectorId], references: [id], onDelete: SetNull)
+  actionsTaken    String
+  actionDate      DateTime
+  conditionsNoted String
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([inspectionId])
+  @@index([inspectorId])
+  @@index([actionDate])
 }
 
 enum InspectionStatus {

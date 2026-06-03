@@ -29,6 +29,7 @@ const adminNavItems = [
 
 const inspectorNavItems = [
   { id: "overview", label: "Overview", href: "/dashboard/inspector/overview", icon: ClipboardList },
+  { id: "inspections", label: "My Inspections", href: "/dashboard/inspector/inspections", icon: CalendarCheck },
   { id: "profile", label: "Profile", href: "/dashboard/inspector/profile", icon: UserCircle },
 ]
 

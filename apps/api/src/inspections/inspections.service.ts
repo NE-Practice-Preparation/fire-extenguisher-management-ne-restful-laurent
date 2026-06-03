@@ -8,6 +8,7 @@ import {
 import { InspectionStatus, Prisma, UserRole } from "@workspace/db"
 
 import type { JwtUser } from "../auth/jwt-auth.guard"
+import { MailService } from "../mail/mail.service"
 import { PrismaService } from "../prisma.service"
 import { AssignInspectorDto } from "./dto/assign-inspector.dto"
 import { CompleteInspectionDto } from "./dto/complete-inspection.dto"
@@ -18,7 +19,10 @@ import { QueryInspectionsDto } from "./dto/query-inspections.dto"
 export class InspectionsService {
   private readonly logger = new Logger(InspectionsService.name)
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mail: MailService
+  ) {}
 
   async create(userId: string, dto: CreateInspectionDto) {
     const extinguisher = await this.prisma.fireExtinguisher.findUnique({
@@ -110,18 +114,23 @@ export class InspectionsService {
 
     const inspector = await this.prisma.user.findUnique({
       where: { id: dto.assignedInspectorId },
-      select: { id: true, role: true },
+      select: { id: true, firstName: true, lastName: true, email: true, role: true },
     })
 
     if (!inspector || inspector.role !== UserRole.INSPECTOR) {
       throw new BadRequestException("Assigned user must be an inspector")
     }
 
-    return this.prisma.inspection.update({
+    const inspection = await this.prisma.inspection.update({
       where: { id },
       data: { assignedInspectorId: dto.assignedInspectorId },
       include: inspectionInclude,
     })
+
+    await this.sendAssignmentEmail(inspector, inspection)
+    this.logger.log(`Inspection ${id} assigned to inspector ${inspector.email}`)
+
+    return inspection
   }
 
   async complete(user: JwtUser, id: string, dto: CompleteInspectionDto) {
@@ -135,14 +144,29 @@ export class InspectionsService {
       throw new BadRequestException("Inspection is already completed")
     }
 
-    return this.prisma.inspection.update({
-      where: { id },
-      data: {
-        status: InspectionStatus.COMPLETED,
-        ...(dto.notes ? { notes: dto.notes } : {}),
-      },
-      include: inspectionInclude,
+    const updated = await this.prisma.$transaction(async (tx) => {
+      await tx.maintenanceActivity.create({
+        data: {
+          inspectionId: id,
+          inspectorId: user.sub,
+          actionsTaken: dto.actionsTaken,
+          actionDate: new Date(dto.actionDate),
+          conditionsNoted: dto.conditionsNoted,
+        },
+      })
+
+      return tx.inspection.update({
+        where: { id },
+        data: {
+          status: InspectionStatus.COMPLETED,
+          notes: dto.conditionsNoted,
+        },
+        include: inspectionInclude,
+      })
     })
+
+    this.logger.log(`Maintenance logged for inspection ${id} by ${user.email}`)
+    return updated
   }
 
   private async requireInspection(id: string) {
@@ -172,6 +196,32 @@ export class InspectionsService {
     if (inspection.createdById === user.sub) return
     throw new ForbiddenException("You do not have access to this inspection")
   }
+
+  private async sendAssignmentEmail(
+    inspector: { firstName: string; email: string },
+    inspection: {
+      id: string
+      scheduledDate: Date
+      scheduledTime: string
+      extinguisher: { serialNumber: string; location: string }
+    }
+  ) {
+    const url = `${process.env.WEB_ORIGIN ?? "http://localhost:3000"}/dashboard/inspector/inspections?inspection=${inspection.id}`
+
+    try {
+      await this.mail.sendTemplateEmail({
+        to: inspector.email,
+        firstName: inspector.firstName,
+        subject: "New inspection assigned",
+        previewText: "You have been assigned a fire extinguisher inspection",
+        message: `You have been assigned to inspect extinguisher ${inspection.extinguisher.serialNumber} at ${inspection.extinguisher.location}. The inspection is scheduled for ${inspection.scheduledDate.toISOString().slice(0, 10)} at ${inspection.scheduledTime}.`,
+        actionLabel: "View assigned inspection",
+        actionUrl: url,
+      })
+    } catch (error) {
+      this.logger.error(`Failed to send assignment email to ${inspector.email}`, error as Error)
+    }
+  }
 }
 
 const inspectionInclude = {
@@ -183,5 +233,18 @@ const inspectionInclude = {
   },
   createdBy: {
     select: { id: true, firstName: true, lastName: true },
+  },
+  maintenanceActivities: {
+    orderBy: { actionDate: "desc" },
+    select: {
+      id: true,
+      actionsTaken: true,
+      actionDate: true,
+      conditionsNoted: true,
+      createdAt: true,
+      inspector: {
+        select: { id: true, firstName: true, lastName: true },
+      },
+    },
   },
 } satisfies Prisma.InspectionInclude
