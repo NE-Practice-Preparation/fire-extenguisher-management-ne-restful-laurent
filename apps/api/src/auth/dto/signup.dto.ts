@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsEmail, IsString, MaxLength, MinLength } from "class-validator"
+import { IsEmail, IsString, Matches, MaxLength, MinLength } from "class-validator"
+
+const STRONG_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/
 
 export class SignupDto {
   @ApiProperty({ example: "Alice" })
@@ -22,5 +24,9 @@ export class SignupDto {
   @IsString()
   @MinLength(8)
   @MaxLength(72)
+  @Matches(STRONG_PASSWORD, {
+    message:
+      "Password must include uppercase, lowercase, a number, and a special character",
+  })
   password!: string
 }

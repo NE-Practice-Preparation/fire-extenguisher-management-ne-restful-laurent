@@ -161,6 +161,9 @@ function SidebarNav({
           <p className="text-xs text-[#BE123C]">
             {roleLabel(role)} Portal
           </p>
+          <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-400">
+            by TWZ LTD
+          </p>
         </div>
       </div>
 
