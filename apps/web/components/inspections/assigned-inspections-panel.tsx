@@ -92,7 +92,7 @@ export function AssignedInspectionsPanel() {
             </div>
           </div>
         </div>
-        <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+        <div className="rounded-lg border border-slate-200 bg-white p-4">
           <p className="text-[13px] text-[#667085]">Pending assignments</p>
           <p className="mt-2 text-2xl font-semibold text-[#101828]">{pendingCount}</p>
         </div>

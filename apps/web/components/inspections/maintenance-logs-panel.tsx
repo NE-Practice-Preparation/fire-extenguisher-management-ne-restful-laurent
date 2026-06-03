@@ -164,7 +164,7 @@ export function MaintenanceLogsPanel() {
 
 function LogMetric({ label, value, detail }: { label: string; value: number; detail: string }) {
   return (
-    <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+    <div className="rounded-lg border border-slate-200 bg-white p-4">
       <p className="text-[13px] text-[#667085]">{label}</p>
       <p className="mt-2 text-2xl font-semibold text-[#101828]">{value}</p>
       <p className="mt-1 text-[13px] text-[#667085]">{detail}</p>

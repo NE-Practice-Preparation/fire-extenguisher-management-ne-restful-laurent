@@ -166,7 +166,7 @@ function MetricCard({
   detail: string
 }) {
   return (
-    <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+    <div className="rounded-lg border border-slate-200 bg-white p-4">
       <div className="mb-4 flex items-center justify-between">
         <span className="text-[13px] text-[#667085]">{label}</span>
         <Icon className="size-5 text-[#BE123C]" strokeWidth={1.5} />
@@ -179,7 +179,7 @@ function MetricCard({
 
 function ReportPanel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="overflow-hidden rounded-lg border border-slate-100 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+    <section className="overflow-hidden rounded-lg border border-slate-200 bg-white">
       <div className="border-b border-slate-100 px-4 py-3">
         <h2 className="text-[15px] font-medium text-[#101828]">{title}</h2>
       </div>
