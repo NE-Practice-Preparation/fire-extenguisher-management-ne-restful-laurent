@@ -45,6 +45,7 @@ async function main() {
       passwordHash,
       role: UserRole.ADMIN,
       isActive: true,
+      passwordSetAt: new Date(),
     },
   })
 

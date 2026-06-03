@@ -17,6 +17,7 @@ import { ForgotPasswordDto } from "./dto/forgot-password.dto"
 import { LoginDto } from "./dto/login.dto"
 import { ResetPasswordDto } from "./dto/reset-password.dto"
 import { SignupDto } from "./dto/signup.dto"
+import { UpdateProfileDto } from "./dto/update-profile.dto"
 import { hashPassword, verifyPassword } from "./password"
 
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000 // 1 hour
@@ -48,6 +49,7 @@ export class AuthService {
         email,
         passwordHash: await hashPassword(dto.password),
         role: UserRole.USER,
+        passwordSetAt: new Date(),
       },
       select: userSelect,
     })
@@ -140,6 +142,9 @@ export class AuthService {
         passwordHash: await hashPassword(dto.newPassword),
         resetToken: null,
         resetTokenExpiry: null,
+        // Marks the account as having completed setup: invited users become
+        // "active" (no longer pending) once they set their own password.
+        passwordSetAt: new Date(),
       },
     })
 
@@ -165,6 +170,37 @@ export class AuthService {
 
     this.logger.log(`Password changed for ${user.email}`)
     return { success: true, message: "Password updated successfully" }
+  }
+
+  async updateProfile(userId: string, dto: UpdateProfileDto) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } })
+
+    if (!user) {
+      throw new UnauthorizedException("User not found")
+    }
+
+    if (dto.email && dto.email.toLowerCase() !== user.email) {
+      const email = dto.email.toLowerCase()
+      const clash = await this.prisma.user.findUnique({ where: { email } })
+
+      if (clash) {
+        throw new ConflictException("Email is already registered")
+      }
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(dto.firstName ? { firstName: dto.firstName } : {}),
+        ...(dto.lastName ? { lastName: dto.lastName } : {}),
+        ...(dto.email ? { email: dto.email.toLowerCase() } : {}),
+      },
+      select: userSelect,
+    })
+
+    this.logger.log(`Profile updated for ${updated.email}`)
+    // Return a fresh token because the JWT carries name/email.
+    return this.createAuthResponse(toAuthUser(updated))
   }
 
   private async createAuthResponse(user: AuthUser) {

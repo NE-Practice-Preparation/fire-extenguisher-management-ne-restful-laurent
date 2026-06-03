@@ -12,6 +12,7 @@ import {
   House,
   PlusCircle,
   UserCircle,
+  Users,
 } from "lucide-react"
 
 import { DashboardShell } from "@/components/dashboard-shell"
@@ -19,9 +20,7 @@ import { Role } from "@/lib/types"
 
 const adminNavItems = [
   { id: "overview", label: "Overview", href: "/dashboard/admin/overview", icon: ClipboardList },
-  { id: "create", label: "Create item", href: "/dashboard/admin/create", icon: PlusCircle },
-  { id: "records", label: "Records", href: "/dashboard/admin/records", icon: Database },
-  { id: "reports", label: "Users", href: "/dashboard/admin/reports", icon: BarChart3 },
+  { id: "users", label: "User Management", href: "/dashboard/admin/users", icon: Users },
   { id: "profile", label: "Profile", href: "/dashboard/admin/profile", icon: UserCircle },
 ]
 

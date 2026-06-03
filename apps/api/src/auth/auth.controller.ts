@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common"
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Patch,
+  Post,
+  UseGuards,
+} from "@nestjs/common"
 import {
   ApiBearerAuth,
   ApiOkResponse,
@@ -14,6 +23,7 @@ import { ForgotPasswordDto } from "./dto/forgot-password.dto"
 import { LoginDto } from "./dto/login.dto"
 import { ResetPasswordDto } from "./dto/reset-password.dto"
 import { SignupDto } from "./dto/signup.dto"
+import { UpdateProfileDto } from "./dto/update-profile.dto"
 import { JwtAuthGuard } from "./jwt-auth.guard"
 import type { JwtUser } from "./jwt-auth.guard"
 
@@ -71,6 +81,16 @@ export class AuthController {
   @ApiOkResponse({ description: "Password reset; user can log in with the new password." })
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.authService.resetPassword(dto)
+  }
+
+  @Patch("profile")
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: "Update the current user's profile (returns a fresh token)" })
+  @ApiOkResponse({ description: "Returns a new access token and the updated user." })
+  @ApiUnauthorizedResponse({ description: "Bearer token is missing, invalid, or expired." })
+  updateProfile(@CurrentUser() user: JwtUser, @Body() dto: UpdateProfileDto) {
+    return this.authService.updateProfile(user.sub, dto)
   }
 
   @Post("change-password")
