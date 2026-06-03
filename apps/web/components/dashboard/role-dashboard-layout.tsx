@@ -9,6 +9,7 @@ import {
   ClipboardList,
   Database,
   FileSpreadsheet,
+  FireExtinguisher,
   House,
   PlusCircle,
   UserCircle,
@@ -21,6 +22,7 @@ import { Role } from "@/lib/types"
 const adminNavItems = [
   { id: "overview", label: "Overview", href: "/dashboard/admin/overview", icon: ClipboardList },
   { id: "users", label: "User Management", href: "/dashboard/admin/users", icon: Users },
+  { id: "extinguishers", label: "Fire Extinguishers", href: "/dashboard/admin/extinguishers", icon: FireExtinguisher },
   { id: "profile", label: "Profile", href: "/dashboard/admin/profile", icon: UserCircle },
 ]
 
@@ -31,10 +33,9 @@ const inspectorNavItems = [
 
 const userNavItems = [
   { id: "overview", label: "Overview", href: "/dashboard/user/overview", icon: ClipboardList },
-  { id: "entries", label: "Entries", href: "/dashboard/user/entries", icon: PlusCircle },
-  { id: "reviews", label: "Reviews", href: "/dashboard/user/reviews", icon: Database },
+  { id: "extinguishers", label: "Fire Extinguishers", href: "/dashboard/user/extinguishers", icon: FireExtinguisher },
+  { id: "inspections", label: "Inspections", href: "/dashboard/user/inspections", icon: CalendarCheck },
   { id: "profile", label: "Profile", href: "/dashboard/user/profile", icon: UserCircle },
-  { id: "notifications", label: "Notifications", href: "/dashboard/user/notifications", icon: Bell },
 ]
 
 const navByRole = {

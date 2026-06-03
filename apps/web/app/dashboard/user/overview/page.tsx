@@ -9,10 +9,10 @@ export default function Role2OverviewPage() {
   return (
     <PageContainer
       role="user"
-      title="Welcome, John"
-      description="View & manage active elders and requests"
+      title="Overview"
+      description="View fire extinguishers and schedule inspections."
       action={
-        <PrimaryDashboardButton label="New Application" href="/dashboard/user/entries" />
+        <PrimaryDashboardButton label="Schedule Inspection" href="/dashboard/user/inspections" />
       }
       breadcrumbs={[
         { label: "User", href: "/dashboard/user" },

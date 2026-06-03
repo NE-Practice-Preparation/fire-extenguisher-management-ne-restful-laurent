@@ -1,7 +1,7 @@
 import { api } from "./api"
 import { Role } from "./types"
 
-export type UserStatus = "PENDING" | "ACTIVE" | "INACTIVE"
+export type UserStatus = "ACTIVE" | "DEACTIVATED"
 
 export type ManagedUser = {
   id: string

@@ -248,23 +248,12 @@ const userSelect = {
 
 type SelectedUser = {
   isActive: boolean
-  passwordSetAt: Date | null
 }
 
-export type UserStatus = "PENDING" | "ACTIVE" | "INACTIVE"
+export type UserStatus = "ACTIVE" | "DEACTIVATED"
 
 function statusOf(user: SelectedUser): UserStatus {
-  if (!user.isActive) {
-    return "INACTIVE"
-  }
-
-  // Invited accounts that have not set their own password yet are "pending"
-  // until they follow the email link and complete setup.
-  if (!user.passwordSetAt) {
-    return "PENDING"
-  }
-
-  return "ACTIVE"
+  return user.isActive ? "ACTIVE" : "DEACTIVATED"
 }
 
 function withStatus<T extends SelectedUser>(user: T) {

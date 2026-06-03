@@ -4,7 +4,6 @@ import * as React from "react"
 import {
   Ban,
   CheckCircle2,
-  Clock,
   Loader2,
   Mail,
   Plus,
@@ -123,14 +122,16 @@ export function UsersTable({ role }: { role: TableRole }) {
           />
         </div>
 
-        <button
-          type="button"
-          onClick={() => setCreateOpen(true)}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#BE123C] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#9F1239]"
-        >
-          <Plus className="h-4 w-4" />
-          New {noun}
-        </button>
+        {role === "INSPECTOR" ? (
+          <button
+            type="button"
+            onClick={() => setCreateOpen(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#BE123C] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#9F1239]"
+          >
+            <Plus className="h-4 w-4" />
+            New {noun}
+          </button>
+        ) : null}
       </div>
 
       {/* Table */}
@@ -164,9 +165,11 @@ export function UsersTable({ role }: { role: TableRole }) {
                   <td colSpan={5} className="px-4 py-14 text-center">
                     <UserPlus className="mx-auto mb-3 h-8 w-8 text-slate-300" />
                     <p className="text-sm font-medium text-slate-600">No {noun.toLowerCase()}s yet</p>
-                    <p className="text-xs text-slate-400">
-                      Create a {noun.toLowerCase()} to send them a set-password invite.
-                    </p>
+                    {role === "INSPECTOR" ? (
+                      <p className="text-xs text-slate-400">
+                        Create an inspector to send them a set-password invite.
+                      </p>
+                    ) : null}
                   </td>
                 </tr>
               ) : (
@@ -300,19 +303,14 @@ export function UsersTable({ role }: { role: TableRole }) {
 function StatusBadge({ status }: { status: UserStatus }) {
   const config = {
     ACTIVE: { label: "Active", dot: "bg-green-500", cls: "bg-green-50 text-green-700" },
-    PENDING: { label: "Pending", dot: "bg-amber-500", cls: "bg-amber-50 text-amber-700" },
-    INACTIVE: { label: "Inactive", dot: "bg-slate-400", cls: "bg-slate-100 text-slate-500" },
+    DEACTIVATED: { label: "Deactivated", dot: "bg-slate-400", cls: "bg-slate-100 text-slate-500" },
   }[status]
 
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium ${config.cls}`}
     >
-      {status === "PENDING" ? (
-        <Clock className="size-3" />
-      ) : (
-        <span className={`size-1.5 rounded-full ${config.dot}`} />
-      )}
+      <span className={`size-1.5 rounded-full ${config.dot}`} />
       {config.label}
     </span>
   )

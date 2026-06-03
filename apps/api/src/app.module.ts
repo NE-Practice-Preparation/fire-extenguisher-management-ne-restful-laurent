@@ -6,6 +6,8 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler"
 import { AppController } from "./app.controller"
 import { AppService } from "./app.service"
 import { AuthModule } from "./auth/auth.module"
+import { ExtinguishersModule } from "./extinguishers/extinguishers.module"
+import { InspectionsModule } from "./inspections/inspections.module"
 import { PrismaService } from "./prisma.service"
 import { UsersModule } from "./users/users.module"
 
@@ -29,6 +31,8 @@ import { UsersModule } from "./users/users.module"
     ]),
     AuthModule,
     UsersModule,
+    ExtinguishersModule,
+    InspectionsModule,
   ],
   controllers: [AppController],
   providers: [

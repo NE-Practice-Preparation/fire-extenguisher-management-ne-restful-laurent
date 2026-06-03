@@ -1,9 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { Bell, Save, Shield, Upload, User } from "lucide-react"
+import * as React from "react"
+import { Eye, EyeOff, Loader2, Save, Shield, User } from "lucide-react"
 
-type UserRole = "applicant" | "super-admin" | "evaluator" | "admin" | "inspector" | "user"
+import { useToast } from "@/components/toast"
+import { getSession, saveAuth } from "@/lib/auth"
+import { changePassword, updateProfile } from "@/lib/profile"
+
+type UserRole = "admin" | "inspector" | "user"
 
 type SharedProfileContainerProps = {
   role: UserRole
@@ -15,31 +19,80 @@ function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ")
 }
 
-export function SharedProfileContainer({
-  role,
-  userName = "Template User",
-  userEmail = "user@example.com",
-}: SharedProfileContainerProps) {
-  const [activeTab, setActiveTab] = useState<"personal" | "security" | "notifications">(
-    "personal"
-  )
+export function SharedProfileContainer({ role }: SharedProfileContainerProps) {
+  const { toast } = useToast()
+  const [activeTab, setActiveTab] = React.useState<"personal" | "security">("personal")
+
+  // Personal info
+  const [firstName, setFirstName] = React.useState("")
+  const [lastName, setLastName] = React.useState("")
+  const [email, setEmail] = React.useState("")
+  const [savingProfile, setSavingProfile] = React.useState(false)
+
+  // Security
+  const [currentPassword, setCurrentPassword] = React.useState("")
+  const [newPassword, setNewPassword] = React.useState("")
+  const [confirmPassword, setConfirmPassword] = React.useState("")
+  const [savingPassword, setSavingPassword] = React.useState(false)
+
+  React.useEffect(() => {
+    const session = getSession()
+    if (session) {
+      setFirstName(session.user.firstName)
+      setLastName(session.user.lastName)
+      setEmail(session.user.email)
+    }
+  }, [])
+
+  async function saveProfile(event: React.FormEvent) {
+    event.preventDefault()
+    const session = getSession()
+    if (!session) return
+    setSavingProfile(true)
+    try {
+      const res = await updateProfile(session.token, { firstName, lastName, email })
+      saveAuth(res) // refresh token + stored user (name/email live in the JWT)
+      toast({ type: "success", title: "Profile updated", description: "Your changes were saved." })
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : "Could not save profile"
+      toast({ type: "error", title: "Save failed", description: message })
+    } finally {
+      setSavingProfile(false)
+    }
+  }
+
+  async function savePassword(event: React.FormEvent) {
+    event.preventDefault()
+    const session = getSession()
+    if (!session) return
+
+    if (newPassword !== confirmPassword) {
+      toast({ type: "error", title: "Passwords do not match", description: "Re-enter the new password." })
+      return
+    }
+    if (newPassword.length < 8) {
+      toast({ type: "error", title: "Password too short", description: "Use at least 8 characters." })
+      return
+    }
+
+    setSavingPassword(true)
+    try {
+      await changePassword(session.token, { currentPassword, newPassword })
+      toast({ type: "success", title: "Password updated", description: "Use your new password next time." })
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : "Could not change password"
+      toast({ type: "error", title: "Change failed", description: message })
+    } finally {
+      setSavingPassword(false)
+    }
+  }
 
   const tabs = [
-    {
-      id: "personal",
-      label: "Personal Information",
-      icon: User,
-    },
-    {
-      id: "security",
-      label: "Security & Password",
-      icon: Shield,
-    },
-    {
-      id: "notifications",
-      label: "Notification Preferences",
-      icon: Bell,
-    },
+    { id: "personal", label: "Personal Information", icon: User },
+    { id: "security", label: "Security & Password", icon: Shield },
   ] as const
 
   return (
@@ -48,7 +101,6 @@ export function SharedProfileContainer({
         {tabs.map((tab) => {
           const Icon = tab.icon
           const selected = activeTab === tab.id
-
           return (
             <button
               key={tab.id}
@@ -56,9 +108,7 @@ export function SharedProfileContainer({
               onClick={() => setActiveTab(tab.id)}
               className={cn(
                 "flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition-colors",
-                selected
-                  ? "bg-[#F9FAFB] text-[#BE123C]"
-                  : "text-[#353E49] hover:bg-slate-50"
+                selected ? "bg-[#F9FAFB] text-[#BE123C]" : "text-[#353E49] hover:bg-slate-50"
               )}
             >
               <Icon className="h-4 w-4" />
@@ -70,101 +120,68 @@ export function SharedProfileContainer({
 
       <section className="min-w-0 flex-1">
         {activeTab === "personal" ? (
-          <div className="space-y-6">
-            <div className="flex items-center gap-6 border-b border-slate-100 pb-4">
-              <div className="group relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
-                <User className="h-8 w-8 text-slate-400" />
-
-                <div className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                  <Upload className="mb-1 h-4 w-4 text-white" />
-                  <span className="text-[10px] font-medium text-white">Upload</span>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-semibold text-slate-900">Profile Picture</h3>
-                <p className="mt-1 max-w-sm text-xs text-slate-500">
-                  Upload a high-resolution image to represent your account. Recommended size:
-                  256x256px.
-                </p>
-              </div>
-            </div>
-
+          <form onSubmit={saveProfile} className="space-y-6">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <ProfileInput label="Full Name" defaultValue={userName} />
-
-              <ProfileInput
-                label="Email Address"
-                type="email"
-                defaultValue={userEmail}
-                readOnly
-              />
-
-              <ProfileInput label="Job Title / Role" defaultValue={roleLabel(role)} readOnly />
-
-              <ProfileInput label="Phone Number" type="tel" placeholder="+250 123 456 789" />
+              <ProfileInput label="First Name" value={firstName} onChange={setFirstName} required />
+              <ProfileInput label="Last Name" value={lastName} onChange={setLastName} required />
+              <ProfileInput label="Email Address" type="email" value={email} onChange={setEmail} required />
+              <ProfileInput label="Role" value={roleLabel(role)} readOnly />
             </div>
 
-            <div className="flex justify-end pt-6">
+            <div className="flex justify-end pt-2">
               <button
-                type="button"
-                className="flex items-center gap-2 rounded-lg bg-[#BE123C] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#9F1239] active:bg-[#881337]"
+                type="submit"
+                disabled={savingProfile}
+                className="flex items-center gap-2 rounded-lg bg-[#BE123C] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#9F1239] active:bg-[#881337] disabled:opacity-60"
               >
-                <Save className="h-4 w-4" />
+                {savingProfile ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 Save Changes
               </button>
             </div>
-          </div>
+          </form>
         ) : null}
 
         {activeTab === "security" ? (
-          <div className="space-y-6">
+          <form onSubmit={savePassword} className="space-y-6">
             <h3 className="border-b border-slate-100 pb-4 text-sm font-semibold text-slate-900">
               Update Password
             </h3>
 
             <div className="max-w-md space-y-5">
-              <ProfileInput label="Current Password" type="password" />
-              <ProfileInput label="New Password" type="password" />
-              <ProfileInput label="Confirm New Password" type="password" />
+              <ProfileInput
+                label="Current Password"
+                type="password"
+                value={currentPassword}
+                onChange={setCurrentPassword}
+                required
+              />
+              <ProfileInput
+                label="New Password"
+                type="password"
+                value={newPassword}
+                onChange={setNewPassword}
+                required
+              />
+              <ProfileInput
+                label="Confirm New Password"
+                type="password"
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+                required
+              />
             </div>
 
-            <div className="flex justify-start pt-6">
+            <div className="flex justify-start pt-2">
               <button
-                type="button"
-                className="rounded-lg bg-[#353E49] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+                type="submit"
+                disabled={savingPassword}
+                className="flex items-center gap-2 rounded-lg bg-[#353E49] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:opacity-60"
               >
-                Update Security
+                {savingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                Update Password
               </button>
             </div>
-          </div>
-        ) : null}
-
-        {activeTab === "notifications" ? (
-          <div className="space-y-6">
-            <h3 className="border-b border-slate-100 pb-4 text-sm font-semibold text-slate-900">
-              Email Preferences
-            </h3>
-
-            <div className="max-w-xl space-y-4">
-              <NotificationOption
-                title="Application Updates"
-                description="Receive an email whenever important account or workflow data changes."
-                defaultChecked
-              />
-
-              <NotificationOption
-                title="System Alerts"
-                description="Receive immediate notifications regarding maintenance and security events."
-                defaultChecked
-              />
-
-              <NotificationOption
-                title="Weekly Summaries"
-                description="Receive a consolidated weekly digest of system activity and pending tasks."
-              />
-            </div>
-          </div>
+          </form>
         ) : null}
       </section>
     </div>
@@ -174,79 +191,58 @@ export function SharedProfileContainer({
 function ProfileInput({
   label,
   type = "text",
-  defaultValue,
+  value,
+  onChange,
   placeholder,
   readOnly = false,
+  required = false,
 }: {
   label: string
   type?: string
-  defaultValue?: string
+  value: string
+  onChange?: (value: string) => void
   placeholder?: string
   readOnly?: boolean
+  required?: boolean
 }) {
+  const [show, setShow] = React.useState(false)
+  const isPassword = type === "password"
+  const inputType = isPassword ? (show ? "text" : "password") : type
+
   return (
     <div className="space-y-1.5">
       <label className="text-xs font-medium text-[#344054]">{label}</label>
-
-      <input
-        type={type}
-        defaultValue={defaultValue}
-        placeholder={placeholder}
-        readOnly={readOnly}
-        className={cn(
-          "h-10 w-full rounded-lg border border-[#D0D5DD] px-3 text-sm text-[#101828] transition-all focus:border-[#BE123C] focus:outline-none focus:ring-1 focus:ring-[#BE123C]",
-          readOnly ? "bg-slate-50" : "bg-white"
-        )}
-      />
+      <div className="relative">
+        <input
+          type={inputType}
+          value={value}
+          onChange={(event) => onChange?.(event.target.value)}
+          placeholder={placeholder}
+          readOnly={readOnly}
+          required={required}
+          className={cn(
+            "h-10 w-full rounded-lg border border-[#D0D5DD] px-3 text-sm text-[#101828] transition-all focus:border-[#BE123C] focus:outline-none focus:ring-1 focus:ring-[#BE123C]",
+            isPassword && "pr-10",
+            readOnly ? "bg-slate-50" : "bg-white"
+          )}
+        />
+        {isPassword ? (
+          <button
+            type="button"
+            onClick={() => setShow((value) => !value)}
+            aria-label={show ? "Hide password" : "Show password"}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
+          >
+            {show ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+          </button>
+        ) : null}
+      </div>
     </div>
   )
 }
 
-function NotificationOption({
-  title,
-  description,
-  defaultChecked = false,
-}: {
-  title: string
-  description: string
-  defaultChecked?: boolean
-}) {
-  return (
-    <label className="flex cursor-pointer items-start gap-3">
-      <input
-        type="checkbox"
-        defaultChecked={defaultChecked}
-        className="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#BE123C] focus:ring-[#BE123C]"
-      />
-
-      <div>
-        <h4 className="text-sm font-medium text-slate-900">{title}</h4>
-        <p className="mt-0.5 text-xs text-slate-500">{description}</p>
-      </div>
-    </label>
-  )
-}
-
 function roleLabel(role: UserRole) {
-  if (role === "super-admin") {
-    return "Super Administrator"
-  }
-
-  if (role === "evaluator") {
-    return "Evaluator"
-  }
-
-  if (role === "applicant") {
-    return "Applicant"
-  }
-
-  if (role === "admin") {
-    return "Admin"
-  }
-
-  if (role === "inspector") {
-    return "Inspector"
-  }
-
+  if (role === "admin") return "Admin"
+  if (role === "inspector") return "Inspector"
   return "User"
 }
