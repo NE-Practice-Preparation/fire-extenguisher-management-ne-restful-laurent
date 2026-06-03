@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Eye, EyeOff, Loader2, Save, Shield, User } from "lucide-react"
+import { Check, Eye, EyeOff, Loader2, Save, Shield, User, X } from "lucide-react"
 
 import { useToast } from "@/components/toast"
 import { getSession, saveAuth } from "@/lib/auth"
@@ -19,6 +19,14 @@ function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ")
 }
 
+const passwordChecks: { label: string; test: (value: string) => boolean }[] = [
+  { label: "At least 8 characters", test: (value) => value.length >= 8 },
+  { label: "One uppercase letter", test: (value) => /[A-Z]/.test(value) },
+  { label: "One lowercase letter", test: (value) => /[a-z]/.test(value) },
+  { label: "One number", test: (value) => /[0-9]/.test(value) },
+  { label: "One special character (!@#$…)", test: (value) => /[^A-Za-z0-9]/.test(value) },
+]
+
 export function SharedProfileContainer({ role }: SharedProfileContainerProps) {
   const { toast } = useToast()
   const [activeTab, setActiveTab] = React.useState<"personal" | "security">("personal")
@@ -34,6 +42,12 @@ export function SharedProfileContainer({ role }: SharedProfileContainerProps) {
   const [newPassword, setNewPassword] = React.useState("")
   const [confirmPassword, setConfirmPassword] = React.useState("")
   const [savingPassword, setSavingPassword] = React.useState(false)
+
+  const passwordPassed = passwordChecks.filter((check) => check.test(newPassword)).length
+  const passwordStrong = passwordPassed === passwordChecks.length
+  const passwordsMatch = confirmPassword.length > 0 && newPassword === confirmPassword
+  const canChangePassword =
+    currentPassword.length > 0 && passwordStrong && passwordsMatch && !savingPassword
 
   React.useEffect(() => {
     const session = getSession()
@@ -66,12 +80,16 @@ export function SharedProfileContainer({ role }: SharedProfileContainerProps) {
     const session = getSession()
     if (!session) return
 
-    if (newPassword !== confirmPassword) {
-      toast({ type: "error", title: "Passwords do not match", description: "Re-enter the new password." })
+    if (!passwordStrong) {
+      toast({
+        type: "error",
+        title: "Weak password",
+        description: "Your new password does not meet all the requirements.",
+      })
       return
     }
-    if (newPassword.length < 8) {
-      toast({ type: "error", title: "Password too short", description: "Use at least 8 characters." })
+    if (newPassword !== confirmPassword) {
+      toast({ type: "error", title: "Passwords do not match", description: "Re-enter the new password." })
       return
     }
 
@@ -162,6 +180,27 @@ export function SharedProfileContainer({ role }: SharedProfileContainerProps) {
                 onChange={setNewPassword}
                 required
               />
+
+              {newPassword.length > 0 ? (
+                <ul className="space-y-1">
+                  {passwordChecks.map((check) => {
+                    const passed = check.test(newPassword)
+                    return (
+                      <li
+                        key={check.label}
+                        className={cn(
+                          "flex items-center gap-1.5 text-[11px]",
+                          passed ? "text-green-600" : "text-slate-400"
+                        )}
+                      >
+                        {passed ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                        {check.label}
+                      </li>
+                    )
+                  })}
+                </ul>
+              ) : null}
+
               <ProfileInput
                 label="Confirm New Password"
                 type="password"
@@ -169,13 +208,25 @@ export function SharedProfileContainer({ role }: SharedProfileContainerProps) {
                 onChange={setConfirmPassword}
                 required
               />
+
+              {confirmPassword.length > 0 ? (
+                <p
+                  className={cn(
+                    "flex items-center gap-1.5 text-[11px]",
+                    passwordsMatch ? "text-green-600" : "text-red-600"
+                  )}
+                >
+                  {passwordsMatch ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                  {passwordsMatch ? "Passwords match" : "Passwords do not match"}
+                </p>
+              ) : null}
             </div>
 
             <div className="flex justify-start pt-2">
               <button
                 type="submit"
-                disabled={savingPassword}
-                className="flex items-center gap-2 rounded-lg bg-[#353E49] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:opacity-60"
+                disabled={!canChangePassword}
+                className="flex items-center gap-2 rounded-lg bg-[#353E49] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {savingPassword ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 Update Password

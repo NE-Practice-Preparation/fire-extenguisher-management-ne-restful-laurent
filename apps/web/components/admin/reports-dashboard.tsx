@@ -3,26 +3,13 @@
 import * as React from "react"
 import { jsPDF } from "jspdf"
 import autoTable from "jspdf-autotable"
-import {
-  AlertTriangle,
-  BarChart3,
-  Download,
-  FileDown,
-  FileText,
-  Flame,
-  Loader2,
-  ShieldCheck,
-} from "lucide-react"
+import { BarChart3, Download, Eye, FileDown, FileText, Loader2, Trash2, X } from "lucide-react"
 
 import { useToast } from "@/components/toast"
 import { getSession } from "@/lib/auth"
 import { statusLabel as extinguisherStatusLabel, typeLabel } from "@/lib/extinguishers"
 import { statusLabel as inspectionStatusLabel } from "@/lib/inspections"
-import {
-  getReportsSummary,
-  type MaintenanceHistoryReportItem,
-  type ReportsSummary,
-} from "@/lib/reports"
+import { getReportsSummary, type ReportsSummary } from "@/lib/reports"
 import { formatDate } from "@/lib/utils/date"
 
 type ReportType = "FULL" | "INVENTORY" | "INSPECTIONS" | "COMPLIANCE" | "MAINTENANCE"
@@ -34,6 +21,19 @@ const REPORT_TYPES: { value: ReportType; label: string }[] = [
   { value: "COMPLIANCE", label: "Compliance report" },
   { value: "MAINTENANCE", label: "Maintenance report" },
 ]
+
+const STORAGE_KEY = "twz-reports-history"
+
+type GeneratedReport = {
+  id: string
+  type: ReportType
+  generatedAt: string
+  report: ReportsSummary
+}
+
+function typeLabelOf(type: ReportType) {
+  return REPORT_TYPES.find((t) => t.value === type)?.label ?? "Report"
+}
 
 function sections(type: ReportType) {
   return {
@@ -54,9 +54,29 @@ function complianceRate(report: ReportsSummary) {
 export function ReportsDashboard() {
   const { toast } = useToast()
   const [type, setType] = React.useState<ReportType>("FULL")
-  const [report, setReport] = React.useState<ReportsSummary | null>(null)
-  const [generatedType, setGeneratedType] = React.useState<ReportType>("FULL")
   const [generating, setGenerating] = React.useState(false)
+  const [history, setHistory] = React.useState<GeneratedReport[]>([])
+  const [viewer, setViewer] = React.useState<{ url: string; entry: GeneratedReport } | null>(null)
+  const [toDelete, setToDelete] = React.useState<GeneratedReport | null>(null)
+
+  React.useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY)
+      if (raw) setHistory(JSON.parse(raw) as GeneratedReport[])
+    } catch {
+      setHistory([])
+    }
+  }, [])
+
+  function persist(items: GeneratedReport[]) {
+    const trimmed = items.slice(0, 15)
+    setHistory(trimmed)
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed))
+    } catch {
+      /* ignore quota errors */
+    }
+  }
 
   async function generate() {
     const session = getSession()
@@ -66,10 +86,15 @@ export function ReportsDashboard() {
     }
     setGenerating(true)
     try {
-      const data = await getReportsSummary(session.token)
-      setReport(data)
-      setGeneratedType(type)
-      toast({ type: "success", title: "Report generated", description: REPORT_TYPES.find((t) => t.value === type)?.label })
+      const report = await getReportsSummary(session.token)
+      const entry: GeneratedReport = {
+        id: window.crypto.randomUUID(),
+        type,
+        generatedAt: report.generatedAt,
+        report,
+      }
+      persist([entry, ...history])
+      toast({ type: "success", title: "Report generated", description: typeLabelOf(type) })
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "Unable to generate report"
       toast({ type: "error", title: "Generation failed", description: message })
@@ -78,7 +103,28 @@ export function ReportsDashboard() {
     }
   }
 
-  const show = sections(generatedType)
+  function openViewer(entry: GeneratedReport) {
+    const doc = buildPdf(entry.report, entry.type)
+    const url = doc.output("bloburl") as unknown as string
+    setViewer({ url: String(url), entry })
+  }
+
+  function closeViewer() {
+    if (viewer) {
+      try {
+        window.URL.revokeObjectURL(viewer.url)
+      } catch {
+        /* ignore */
+      }
+    }
+    setViewer(null)
+  }
+
+  function confirmRemove() {
+    if (!toDelete) return
+    persist(history.filter((item) => item.id !== toDelete.id))
+    setToDelete(null)
+  }
 
   return (
     <div className="space-y-5">
@@ -92,7 +138,7 @@ export function ReportsDashboard() {
             <div>
               <h2 className="text-base font-semibold text-[#101828]">Generate a report</h2>
               <p className="mt-1 text-sm text-[#667085]">
-                Choose a report type and generate it, then download it as a PDF.
+                Choose a type and generate it. Generated reports are saved below — view or download them anytime.
               </p>
             </div>
           </div>
@@ -120,233 +166,194 @@ export function ReportsDashboard() {
             </button>
           </div>
         </div>
-
-        {report ? (
-          <div className="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-[#667085]">
-              <span className="font-medium text-[#101828]">
-                {REPORT_TYPES.find((t) => t.value === generatedType)?.label}
-              </span>{" "}
-              · generated {formatDate(report.generatedAt)}
-            </p>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <button
-                type="button"
-                onClick={() => downloadCsv(report, generatedType)}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-              >
-                <Download className="size-4" />
-                Download CSV
-              </button>
-              <button
-                type="button"
-                onClick={() => downloadPdf(report, generatedType)}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#BE123C] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#9F1239]"
-              >
-                <FileDown className="size-4" />
-                Download PDF
-              </button>
-            </div>
-          </div>
-        ) : null}
       </div>
 
-      {/* Empty state */}
-      {!report ? (
-        <div className="grid min-h-[260px] place-items-center rounded-lg border border-dashed border-slate-200 bg-white">
-          <div className="text-center">
-            <FileText className="mx-auto mb-3 size-8 text-slate-300" />
-            <p className="text-sm font-medium text-slate-600">No report generated yet</p>
-            <p className="text-xs text-slate-400">Pick a type above and click “Generate report”.</p>
+      {/* History */}
+      <section className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+        <div className="border-b border-slate-100 px-5 py-4">
+          <h2 className="text-base font-semibold text-[#101828]">Generated reports</h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-left text-sm">
+            <thead className="bg-slate-50 text-xs text-[#667085]">
+              <tr>
+                <th className="px-5 py-3 font-medium">Report</th>
+                <th className="px-5 py-3 font-medium">Generated</th>
+                <th className="px-5 py-3 text-right font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {history.length === 0 ? (
+                <tr>
+                  <td colSpan={3} className="px-5 py-14 text-center">
+                    <FileText className="mx-auto mb-3 size-8 text-slate-300" />
+                    <p className="text-sm font-medium text-slate-600">No reports generated yet</p>
+                    <p className="text-xs text-slate-400">Pick a type above and click “Generate report”.</p>
+                  </td>
+                </tr>
+              ) : (
+                history.map((entry) => (
+                  <tr key={entry.id} className="bg-white transition-colors hover:bg-slate-50/70">
+                    <td className="px-5 py-3">
+                      <span className="font-medium text-[#101828]">{typeLabelOf(entry.type)}</span>
+                    </td>
+                    <td className="px-5 py-3 text-[#475467]">{formatDate(entry.generatedAt)}</td>
+                    <td className="px-5 py-3">
+                      <div className="flex items-center justify-end gap-1">
+                        <IconButton label="View" onClick={() => openViewer(entry)} icon={<Eye className="size-4" />} />
+                        <IconButton
+                          label="Download PDF"
+                          onClick={() => buildPdf(entry.report, entry.type).save(fileName(entry, "pdf"))}
+                          icon={<FileDown className="size-4" />}
+                        />
+                        <IconButton label="Download CSV" onClick={() => downloadCsv(entry)} icon={<Download className="size-4" />} />
+                        <IconButton label="Remove" tone="red" onClick={() => setToDelete(entry)} icon={<Trash2 className="size-4" />} />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {viewer ? (
+        <PdfViewerModal
+          title={`${typeLabelOf(viewer.entry.type)} · ${formatDate(viewer.entry.generatedAt)}`}
+          url={viewer.url}
+          onDownload={() => buildPdf(viewer.entry.report, viewer.entry.type).save(fileName(viewer.entry, "pdf"))}
+          onClose={closeViewer}
+        />
+      ) : null}
+
+      {toDelete ? (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md rounded-lg bg-white shadow-xl animate-in zoom-in duration-200">
+            <div className="flex items-start gap-3 border-b border-slate-100 p-5">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-600">
+                <Trash2 className="size-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-[#101828]">Remove report</h3>
+                <p className="mt-1 text-sm text-[#667085]">
+                  Remove the {typeLabelOf(toDelete.type).toLowerCase()} generated on{" "}
+                  {formatDate(toDelete.generatedAt)} from your history? This cannot be undone.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 p-5">
+              <button
+                type="button"
+                onClick={() => setToDelete(null)}
+                className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmRemove}
+                className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
+              >
+                <Trash2 className="size-4" />
+                Remove
+              </button>
+            </div>
           </div>
         </div>
-      ) : (
-        <div className="space-y-5">
-          {show.stock ? (
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-              <MetricCard icon={Flame} label="Total stock" value={report.stock.total} detail="All extinguishers" />
-              <MetricCard icon={BarChart3} label="Added today" value={report.stock.daily} detail="Last 24 hours" />
-              <MetricCard icon={BarChart3} label="Added this month" value={report.stock.monthly} detail="Monthly intake" />
-              <MetricCard icon={BarChart3} label="Added this year" value={report.stock.yearly} detail="Yearly intake" />
-            </div>
-          ) : null}
-
-          {show.compliance ? (
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              <MetricCard icon={ShieldCheck} label="Compliance rate" value={complianceRate(report)} detail="% within expiry" suffix="%" />
-              <MetricCard icon={AlertTriangle} label="Expired units" value={report.expiredExtinguishers.length} detail="Out of compliance" tone="danger" />
-              <MetricCard icon={Flame} label="Total stock" value={report.stock.total} detail="All extinguishers" />
-            </div>
-          ) : null}
-
-          {(show.inspectionStatus || show.extinguisherStatus) ? (
-            <div className="grid gap-4 xl:grid-cols-2">
-              {show.inspectionStatus ? (
-                <ReportPanel title="Inspection Status">
-                  <StatusBars items={report.inspectionStatus.map((item) => ({ label: inspectionStatusLabel(item.status), count: item.count }))} />
-                </ReportPanel>
-              ) : null}
-              {show.extinguisherStatus ? (
-                <ReportPanel title="Extinguisher Status">
-                  <StatusBars items={report.extinguisherStatus.map((item) => ({ label: extinguisherStatusLabel(item.status), count: item.count }))} />
-                </ReportPanel>
-              ) : null}
-            </div>
-          ) : null}
-
-          {show.compliance ? (
-            <ReportPanel title="Expired Extinguishers">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[760px] text-left text-sm">
-                  <thead className="bg-slate-50 text-xs text-[#667085]">
-                    <tr>
-                      <th className="px-4 py-3 font-medium">Serial</th>
-                      <th className="px-4 py-3 font-medium">Location</th>
-                      <th className="px-4 py-3 font-medium">Type</th>
-                      <th className="px-4 py-3 font-medium">Size</th>
-                      <th className="px-4 py-3 font-medium">Expiry</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {report.expiredExtinguishers.length === 0 ? (
-                      <tr>
-                        <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-400">
-                          No expired extinguishers found.
-                        </td>
-                      </tr>
-                    ) : (
-                      report.expiredExtinguishers.map((item) => (
-                        <tr key={item.id}>
-                          <td className="px-4 py-3 font-medium text-[#101828]">{item.serialNumber}</td>
-                          <td className="px-4 py-3 text-[#475467]">{item.location}</td>
-                          <td className="px-4 py-3 text-[#475467]">{typeLabel(item.type)}</td>
-                          <td className="px-4 py-3 text-[#475467]">{item.size}</td>
-                          <td className="px-4 py-3 text-red-600">{formatDate(item.expiryDate)}</td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </ReportPanel>
-          ) : null}
-
-          {show.maintenance ? (
-            <ReportPanel title="Maintenance History">
-              <MaintenanceHistoryList items={report.maintenanceHistory} />
-            </ReportPanel>
-          ) : null}
-        </div>
-      )}
+      ) : null}
     </div>
   )
 }
 
-function MetricCard({
-  icon: Icon,
+function IconButton({
   label,
-  value,
-  detail,
-  suffix = "",
-  tone = "brand",
+  icon,
+  onClick,
+  tone = "slate",
 }: {
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
   label: string
-  value: number
-  detail: string
-  suffix?: string
-  tone?: "brand" | "danger"
+  icon: React.ReactNode
+  onClick: () => void
+  tone?: "slate" | "red"
 }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
-      <div className="mb-4 flex items-center justify-between">
-        <span className="text-[13px] text-[#667085]">{label}</span>
-        <Icon className={`size-5 ${tone === "danger" ? "text-red-600" : "text-[#BE123C]"}`} strokeWidth={1.5} />
-      </div>
-      <div className="text-2xl font-semibold text-[#101828]">
-        {value}
-        {suffix}
-      </div>
-      <p className="mt-1 text-[13px] text-[#667085]">{detail}</p>
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className={
+        tone === "red"
+          ? "inline-flex size-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+          : "inline-flex size-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-[#BE123C]"
+      }
+    >
+      {icon}
+    </button>
   )
 }
 
-function ReportPanel({ title, children }: { title: string; children: React.ReactNode }) {
+function PdfViewerModal({
+  title,
+  url,
+  onDownload,
+  onClose,
+}: {
+  title: string
+  url: string
+  onDownload: () => void
+  onClose: () => void
+}) {
   return (
-    <section className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-      <div className="border-b border-slate-100 px-4 py-3">
-        <h2 className="text-[15px] font-medium text-[#101828]">{title}</h2>
-      </div>
-      <div className="p-4">{children}</div>
-    </section>
-  )
-}
-
-function StatusBars({ items }: { items: { label: string; count: number }[] }) {
-  const max = Math.max(1, ...items.map((item) => item.count))
-  return (
-    <div className="space-y-3">
-      {items.map((item) => (
-        <div key={item.label}>
-          <div className="mb-1 flex items-center justify-between text-sm">
-            <span className="text-[#475467]">{item.label}</span>
-            <span className="font-medium text-[#101828]">{item.count}</span>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 p-4 animate-in fade-in duration-200">
+      <div className="flex h-[88vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl bg-white shadow-xl animate-in zoom-in duration-200">
+        <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-3.5">
+          <div className="flex items-center gap-3">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#FFF1F2] text-[#BE123C]">
+              <FileText className="size-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-[#101828]">Report preview</h3>
+              <p className="text-xs text-[#667085]">{title}</p>
+            </div>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-            <div className="h-full rounded-full bg-[#BE123C]" style={{ width: `${Math.max(4, (item.count / max) * 100)}%` }} />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onDownload}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#BE123C] px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-[#9F1239]"
+            >
+              <FileDown className="size-4" />
+              Download
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            >
+              <X className="size-5" />
+            </button>
           </div>
         </div>
-      ))}
-    </div>
-  )
-}
-
-function MaintenanceHistoryList({ items }: { items: MaintenanceHistoryReportItem[] }) {
-  if (items.length === 0) {
-    return (
-      <div className="rounded-lg border border-dashed border-slate-200 p-4 text-sm text-[#667085]">
-        No maintenance activity has been logged yet.
-      </div>
-    )
-  }
-  return (
-    <div className="space-y-3">
-      {items.map((item) => (
-        <div key={item.id} className="rounded-lg border border-slate-100 p-4">
-          <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="font-medium text-[#101828]">{item.inspection.extinguisher.serialNumber}</p>
-              <p className="text-xs text-slate-400">{item.inspection.extinguisher.location}</p>
-            </div>
-            <div className="text-sm text-[#475467]">{formatDate(item.actionDate)}</div>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div>
-              <p className="mb-1 text-xs font-medium uppercase text-slate-400">Actions taken</p>
-              <p className="text-sm text-[#475467]">{item.actionsTaken}</p>
-            </div>
-            <div>
-              <p className="mb-1 text-xs font-medium uppercase text-slate-400">Conditions noted</p>
-              <p className="text-sm text-[#475467]">{item.conditionsNoted}</p>
-            </div>
-          </div>
-          <p className="mt-3 text-xs text-slate-400">
-            Logged by{" "}
-            {item.inspector ? `${item.inspector.firstName} ${item.inspector.lastName}` : "Unknown inspector"}
-          </p>
+        <div className="flex-1 bg-slate-100">
+          <iframe title="Report PDF" src={url} className="h-full w-full border-0" />
         </div>
-      ))}
+      </div>
     </div>
   )
 }
 
-/* -------------------------------- exports --------------------------------- */
+/* -------------------------------- builders -------------------------------- */
 
-function downloadPdf(report: ReportsSummary, type: ReportType) {
+function fileName(entry: GeneratedReport, ext: string) {
+  return `fire-extinguisher-${entry.type.toLowerCase()}-report-${entry.generatedAt.slice(0, 10)}.${ext}`
+}
+
+function buildPdf(report: ReportsSummary, type: ReportType) {
   const show = sections(type)
   const doc = new jsPDF()
-  const label = REPORT_TYPES.find((t) => t.value === type)?.label ?? "Report"
 
   doc.setFontSize(18)
   doc.setTextColor(16, 24, 40)
@@ -355,7 +362,7 @@ function downloadPdf(report: ReportsSummary, type: ReportType) {
   doc.setTextColor(190, 18, 60)
   doc.text("by TWZ LTD", 14, 24)
   doc.setTextColor(71, 84, 103)
-  doc.text(`${label} — generated ${formatDate(report.generatedAt)}`, 14, 31)
+  doc.text(`${typeLabelOf(type)} — generated ${formatDate(report.generatedAt)}`, 14, 31)
 
   let y = 38
   const headStyles = { fillColor: [190, 18, 60] as [number, number, number], textColor: 255 }
@@ -448,15 +455,16 @@ function downloadPdf(report: ReportsSummary, type: ReportType) {
           ])
         : [["—", "—", "No maintenance logged", "—"]],
       headStyles,
-      styles: { fontSize: 9, cellWidth: "wrap" },
+      styles: { fontSize: 9 },
     })
     after()
   }
 
-  doc.save(`fire-extinguisher-${type.toLowerCase()}-report-${new Date().toISOString().slice(0, 10)}.pdf`)
+  return doc
 }
 
-function downloadCsv(report: ReportsSummary, type: ReportType) {
+function downloadCsv(entry: GeneratedReport) {
+  const { report, type } = entry
   const show = sections(type)
   const rows: string[][] = [["Section", "Item", "Value", "Date", "Notes"]]
   if (show.stock) {
@@ -492,7 +500,7 @@ function downloadCsv(report: ReportsSummary, type: ReportType) {
   const url = window.URL.createObjectURL(blob)
   const link = document.createElement("a")
   link.href = url
-  link.download = `fire-extinguisher-${type.toLowerCase()}-report-${new Date().toISOString().slice(0, 10)}.csv`
+  link.download = fileName(entry, "csv")
   link.click()
   window.URL.revokeObjectURL(url)
 }
