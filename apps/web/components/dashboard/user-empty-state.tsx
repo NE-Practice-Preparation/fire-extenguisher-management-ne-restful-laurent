@@ -24,17 +24,17 @@ export function UserEmptyState() {
 
       <div className="mx-auto mb-8 max-w-[440px] text-center">
         <h3 className="mb-2 text-[17px] font-semibold text-slate-900">
-          No Entries Yet!
+          No Inspections Yet!
         </h3>
 
         <p className="text-[13px] leading-relaxed text-slate-500">
-          You haven&apos;t started any entries. Create your first template entry to track progress here.
+          You haven&apos;t scheduled any inspections. Schedule your first one to track it here.
         </p>
       </div>
 
       <PrimaryDashboardButton
-        label="Start Entry"
-        href="/dashboard/user/entries"
+        label="Schedule Inspection"
+        href="/dashboard/user/inspections"
         className="px-8"
       />
     </div>

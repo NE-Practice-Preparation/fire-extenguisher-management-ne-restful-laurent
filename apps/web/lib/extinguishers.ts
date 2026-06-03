@@ -12,6 +12,8 @@ export const EXTINGUISHER_STATUSES: ExtinguisherStatus[] = [
   "OUT_OF_SERVICE",
 ]
 
+export const EXTINGUISHER_SIZES = ["2.5lbs", "5lbs", "9lbs", "12lbs"]
+
 export type Extinguisher = {
   id: string
   serialNumber: string

@@ -23,6 +23,7 @@ const adminNavItems = [
   { id: "overview", label: "Overview", href: "/dashboard/admin/overview", icon: ClipboardList },
   { id: "users", label: "User Management", href: "/dashboard/admin/users", icon: Users },
   { id: "extinguishers", label: "Fire Extinguishers", href: "/dashboard/admin/extinguishers", icon: FireExtinguisher },
+  { id: "inspections", label: "Inspections", href: "/dashboard/admin/inspections", icon: CalendarCheck },
   { id: "profile", label: "Profile", href: "/dashboard/admin/profile", icon: UserCircle },
 ]
 

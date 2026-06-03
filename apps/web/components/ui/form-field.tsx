@@ -12,6 +12,7 @@ interface FormInputProps {
   type?: string;
   icon?: LucideIcon;
   id?: string;
+  min?: string;
 }
 
 export function FormInput({
@@ -23,6 +24,7 @@ export function FormInput({
   type = "text",
   icon: Icon,
   id,
+  min,
 }: FormInputProps) {
   const inputId = id || label.toLowerCase().replace(/\s+/g, "-");
 
@@ -39,6 +41,7 @@ export function FormInput({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           required={required}
+          min={min}
           className={`w-full ${Icon ? 'pr-12' : 'px-4'} py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#BE123C]/10 focus:border-[#BE123C] transition-all`}
         />
         {Icon && (

@@ -1,33 +1,33 @@
 import Link from "next/link"
-import { CalendarCheck, ChevronRight, FilePlus, HelpCircle, UploadCloud } from "lucide-react"
+import { CalendarPlus, ChevronRight, FlameKindling, History, UserCircle } from "lucide-react"
 
 const quickActions = [
   {
-    title: "Start Entry",
-    description: "Create a new template entry.",
-    href: "/dashboard/user/entries",
-    icon: FilePlus,
+    title: "Schedule Inspection",
+    description: "Book an inspection for an extinguisher.",
+    href: "/dashboard/user/inspections",
+    icon: CalendarPlus,
     color: "#BE123C",
   },
   {
-    title: "Upload Files",
-    description: "Attach files and supporting records.",
-    href: "/dashboard/user/entries",
-    icon: UploadCloud,
+    title: "Fire Extinguishers",
+    description: "Browse all extinguishers and their status.",
+    href: "/dashboard/user/extinguishers",
+    icon: FlameKindling,
     color: "#34C759",
   },
   {
-    title: "View Reviews",
-    description: "Check review progress and feedback.",
-    href: "/dashboard/user/reviews",
-    icon: CalendarCheck,
+    title: "Inspection History",
+    description: "Track your scheduled inspections.",
+    href: "/dashboard/user/inspections",
+    icon: History,
     color: "#FF8D28",
   },
   {
-    title: "Get Support",
-    description: "Ask for help with your submission.",
-    href: "/dashboard/user/notifications",
-    icon: HelpCircle,
+    title: "My Profile",
+    description: "Update your details and password.",
+    href: "/dashboard/user/profile",
+    icon: UserCircle,
     color: "#64748B",
   },
 ]

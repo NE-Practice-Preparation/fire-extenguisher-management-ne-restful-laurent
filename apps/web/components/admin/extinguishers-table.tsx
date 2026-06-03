@@ -2,9 +2,10 @@
 
 import * as React from "react"
 import Image from "next/image"
-import { Eye, Loader2, Pencil, Plus, Search, Trash2, X } from "lucide-react"
+import { CalendarPlus, Eye, Loader2, Pencil, Plus, Search, Trash2, X } from "lucide-react"
 
 import { FormInput, FormSelect } from "@/components/ui/form-field"
+import { ScheduleInspectionModal } from "@/components/inspections/schedule-inspection-modal"
 import { useToast } from "@/components/toast"
 import { getSession } from "@/lib/auth"
 import {
@@ -14,6 +15,7 @@ import {
   statusLabel,
   typeLabel,
   updateExtinguisher,
+  EXTINGUISHER_SIZES,
   EXTINGUISHER_STATUSES,
   EXTINGUISHER_TYPES,
   type Extinguisher,
@@ -47,6 +49,7 @@ export function ExtinguishersTable({ readOnly = false }: { readOnly?: boolean })
   const [formOpen, setFormOpen] = React.useState(false)
   const [editItem, setEditItem] = React.useState<Extinguisher | null>(null)
   const [viewItem, setViewItem] = React.useState<Extinguisher | null>(null)
+  const [requestFor, setRequestFor] = React.useState<Extinguisher | null>(null)
   const [toDelete, setToDelete] = React.useState<Extinguisher | null>(null)
   const [deleting, setDeleting] = React.useState(false)
 
@@ -226,6 +229,17 @@ export function ExtinguishersTable({ readOnly = false }: { readOnly?: boolean })
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
+                        {readOnly ? (
+                          <button
+                            type="button"
+                            onClick={() => setRequestFor(item)}
+                            aria-label="Request inspection"
+                            title="Request inspection"
+                            className="inline-flex size-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-[#FFF1F2] hover:text-[#BE123C]"
+                          >
+                            <CalendarPlus className="h-4 w-4" />
+                          </button>
+                        ) : null}
                         <button
                           type="button"
                           onClick={() => setViewItem(item)}
@@ -316,6 +330,26 @@ export function ExtinguishersTable({ readOnly = false }: { readOnly?: boolean })
                   setViewItem(null)
                 }
           }
+          onRequestInspection={
+            readOnly
+              ? () => {
+                  setRequestFor(viewItem)
+                  setViewItem(null)
+                }
+              : undefined
+          }
+        />
+      ) : null}
+
+      {requestFor ? (
+        <ScheduleInspectionModal
+          presetExtinguisher={{
+            id: requestFor.id,
+            serialNumber: requestFor.serialNumber,
+            location: requestFor.location,
+          }}
+          onClose={() => setRequestFor(null)}
+          onScheduled={() => setRequestFor(null)}
         />
       ) : null}
 
@@ -392,11 +426,13 @@ function ExtinguisherDetailsModal({
   onClose,
   onEdit,
   onDelete,
+  onRequestInspection,
 }: {
   item: Extinguisher
   onClose: () => void
   onEdit?: () => void
   onDelete?: () => void
+  onRequestInspection?: () => void
 }) {
   const rows: { label: string; value: React.ReactNode }[] = [
     { label: "Serial number", value: item.serialNumber },
@@ -450,8 +486,18 @@ function ExtinguisherDetailsModal({
           ))}
         </div>
 
-        {onEdit || onDelete ? (
+        {onEdit || onDelete || onRequestInspection ? (
           <div className="flex items-center justify-end gap-3 border-t border-slate-100 p-6">
+            {onRequestInspection ? (
+              <button
+                type="button"
+                onClick={onRequestInspection}
+                className="inline-flex items-center gap-2 rounded-lg bg-[#BE123C] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#9F1239]"
+              >
+                <CalendarPlus className="size-4" />
+                Request inspection
+              </button>
+            ) : null}
             {onDelete ? (
               <button
                 type="button"
@@ -503,11 +549,27 @@ function ExtinguisherFormModal({
   const [status, setStatus] = React.useState<ExtinguisherStatus>(item?.status ?? "ACTIVE")
   const [saving, setSaving] = React.useState(false)
   const [error, setError] = React.useState("")
+  const today = new Date().toLocaleDateString("en-CA")
 
   async function submit(event: React.FormEvent) {
     event.preventDefault()
     const session = getSession()
     if (!session) return
+
+    // Client-side validation (the API enforces these too).
+    if (!isEdit && installationDate < today) {
+      setError("Installation date cannot be in the past.")
+      return
+    }
+    if (!isEdit && expiryDate < today) {
+      setError("Expiry date cannot be in the past.")
+      return
+    }
+    if (expiryDate < installationDate) {
+      setError("Expiry date must be on or after the installation date.")
+      return
+    }
+
     setSaving(true)
     setError("")
     const payload = { serialNumber, location, type, size, installationDate, expiryDate, status }
@@ -554,7 +616,14 @@ function ExtinguisherFormModal({
         <form onSubmit={submit} className="space-y-5 p-5">
           <div className="grid grid-cols-2 gap-4">
             <FormInput label="Serial number" value={serialNumber} onChange={setSerialNumber} placeholder="FE-2026-0001" required />
-            <FormInput label="Size" value={size} onChange={setSize} placeholder="6kg" required />
+            <FormSelect
+              label="Size"
+              value={size}
+              onChange={setSize}
+              options={EXTINGUISHER_SIZES.map((option) => ({ label: option, value: option }))}
+              placeholder="Select size"
+              required
+            />
           </div>
           <FormInput label="Location" value={location} onChange={setLocation} placeholder="Building A - Floor 2" required />
           <div className="grid grid-cols-2 gap-4">
@@ -572,8 +641,22 @@ function ExtinguisherFormModal({
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <FormInput label="Installation date" type="date" value={installationDate} onChange={setInstallationDate} required />
-            <FormInput label="Expiry date" type="date" value={expiryDate} onChange={setExpiryDate} required />
+            <FormInput
+              label="Installation date"
+              type="date"
+              value={installationDate}
+              onChange={setInstallationDate}
+              min={isEdit ? undefined : today}
+              required
+            />
+            <FormInput
+              label="Expiry date"
+              type="date"
+              value={expiryDate}
+              onChange={setExpiryDate}
+              min={isEdit ? undefined : today}
+              required
+            />
           </div>
 
           {error ? (

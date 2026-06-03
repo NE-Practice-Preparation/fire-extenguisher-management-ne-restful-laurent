@@ -67,6 +67,10 @@ export function cancelInspection(token: string, id: string) {
   return api<Inspection>(`/inspections/${id}/cancel`, { method: "PATCH", token })
 }
 
+export function getInspection(token: string, id: string) {
+  return api<Inspection>(`/inspections/${id}`, { token })
+}
+
 export function statusLabel(status: InspectionStatus) {
   return status.charAt(0) + status.slice(1).toLowerCase()
 }
