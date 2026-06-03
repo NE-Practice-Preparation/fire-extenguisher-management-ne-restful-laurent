@@ -1,4 +1,4 @@
-export type Role = "ROLE1" | "ROLE2"
+export type Role = "ADMIN" | "INSPECTOR" | "USER"
 
 export type AuthUser = {
   id: string
@@ -6,6 +6,7 @@ export type AuthUser = {
   lastName: string
   email: string
   role: Role
+  isActive?: boolean
 }
 
 export type AuthResponse = {
@@ -14,6 +15,7 @@ export type AuthResponse = {
 }
 
 export type AdminUser = AuthUser & {
+  isActive: boolean
   createdAt: string
   updatedAt: string
 }

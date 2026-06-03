@@ -83,7 +83,7 @@ function renderGenericEmailTemplate({
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;overflow:hidden;border:1px solid #e4e7ec;border-radius:16px;background:#ffffff;">
             <tr>
               <td style="padding:28px 28px 16px;border-bottom:1px solid #eef2f6;">
-                <div style="font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0088ff;">Restful Template</div>
+                <div style="font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#BE123C;">Fire Extinguisher Management</div>
                 <h1 style="margin:12px 0 0;font-size:24px;line-height:1.25;color:#101828;">Hello ${safeFirstName},</h1>
               </td>
             </tr>
@@ -96,7 +96,7 @@ function renderGenericEmailTemplate({
               safeActionLabel && safeActionUrl
                 ? `<tr>
               <td style="padding:20px 28px 8px;">
-                <a href="${safeActionUrl}" style="display:inline-block;border-radius:10px;background:#0088ff;padding:12px 18px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;">${safeActionLabel}</a>
+                <a href="${safeActionUrl}" style="display:inline-block;border-radius:10px;background:#BE123C;padding:12px 18px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;">${safeActionLabel}</a>
               </td>
             </tr>`
                 : ""

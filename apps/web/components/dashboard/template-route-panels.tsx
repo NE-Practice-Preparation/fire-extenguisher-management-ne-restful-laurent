@@ -18,7 +18,7 @@ import { EmptyState, Field, Panel, StatsGrid } from "@/components/dashboard-shel
 import { useToast } from "@/components/toast"
 import { AppLoader } from "@/components/ui/app-loader"
 import { api } from "@/lib/api"
-import { getSession } from "@/lib/auth"
+import { getSession, roleLabel } from "@/lib/auth"
 import { AdminUser } from "@/lib/types"
 
 export function CreateItemPanel() {
@@ -193,15 +193,15 @@ export function ReportsPanel() {
               iconColor: "#BE123C",
             },
             {
-              label: "Role 1 users",
-              value: users.filter((user) => user.role === "ROLE1").length,
-              detail: "Admin portal access",
+              label: "Inspectors",
+              value: users.filter((user) => user.role === "INSPECTOR").length,
+              detail: "Inspector portal access",
               icon: CheckCheck,
               iconColor: "#34C759",
             },
             {
-              label: "Role 2 users",
-              value: users.filter((user) => user.role === "ROLE2").length,
+              label: "Users",
+              value: users.filter((user) => user.role === "USER").length,
               detail: "User portal access",
               icon: FileText,
               iconColor: "#FF8D28",
@@ -256,7 +256,7 @@ export function ReportsPanel() {
                     <td className="px-3 py-3 text-[#475467]">{user.email}</td>
                     <td className="px-3 py-3">
                       <span className="inline-flex rounded-lg bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">
-                        {user.role === "ROLE1" ? "Role 1" : "Role 2"}
+                        {roleLabel(user.role)}
                       </span>
                     </td>
                     <td className="px-3 py-3 text-[#475467]">{formatDate(user.createdAt)}</td>

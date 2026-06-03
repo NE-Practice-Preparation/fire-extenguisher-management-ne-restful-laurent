@@ -14,7 +14,7 @@ type JwtPayload = {
 export function normalizeRole(role: unknown): Role | null {
   const normalized = String(role ?? "").toUpperCase()
 
-  if (normalized === "ROLE1" || normalized === "ROLE2") {
+  if (normalized === "ADMIN" || normalized === "INSPECTOR" || normalized === "USER") {
     return normalized
   }
 
@@ -95,8 +95,26 @@ export function getSession() {
   return { token, user }
 }
 
+export function roleLabel(role: Role) {
+  switch (role) {
+    case "ADMIN":
+      return "Admin"
+    case "INSPECTOR":
+      return "Inspector"
+    default:
+      return "User"
+  }
+}
+
 export function dashboardPathForRole(role: Role) {
-  return role === "ROLE1" ? "/dashboard/role1" : "/dashboard/role2"
+  switch (role) {
+    case "ADMIN":
+      return "/dashboard/admin"
+    case "INSPECTOR":
+      return "/dashboard/inspector"
+    default:
+      return "/dashboard/user"
+  }
 }
 
 function decodeJwtPayload(token: string): JwtPayload | null {

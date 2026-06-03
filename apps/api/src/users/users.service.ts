@@ -52,7 +52,7 @@ export class UsersService {
     await this.mail.sendTemplateEmail({
       to: user.email,
       firstName: user.firstName,
-      subject: "A quick update from Restful Template",
+      subject: "A quick update from Fire Extinguisher Management",
       previewText: `Template message ${reference}`,
       message: `This is a generic template email sent from the admin portal. Reference: ${reference}. You can replace this copy with your own workflow notification, invitation, reminder, or account update.`,
       actionLabel: "Open portal",

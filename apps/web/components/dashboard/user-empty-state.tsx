@@ -34,7 +34,7 @@ export function UserEmptyState() {
 
       <PrimaryDashboardButton
         label="Start Entry"
-        href="/dashboard/role2/entries"
+        href="/dashboard/user/entries"
         className="px-8"
       />
     </div>

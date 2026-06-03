@@ -4,7 +4,7 @@ import { AuthCard } from "@/components/auth-card"
 
 export const metadata: Metadata = {
   title: "Login",
-  description: "Sign in to your Restful Template account.",
+  description: "Sign in to your Fire Extinguisher Management account.",
 }
 
 export default function LoginPage() {

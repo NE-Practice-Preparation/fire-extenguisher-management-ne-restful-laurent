@@ -17,25 +17,31 @@ import {
 import { DashboardShell } from "@/components/dashboard-shell"
 import { Role } from "@/lib/types"
 
-const role1NavItems = [
-  { id: "overview", label: "Overview", href: "/dashboard/role1/overview", icon: ClipboardList },
-  { id: "create", label: "Create item", href: "/dashboard/role1/create", icon: PlusCircle },
-  { id: "records", label: "Records", href: "/dashboard/role1/records", icon: Database },
-  { id: "reports", label: "Users", href: "/dashboard/role1/reports", icon: BarChart3 },
-  { id: "profile", label: "Profile", href: "/dashboard/role1/profile", icon: UserCircle },
+const adminNavItems = [
+  { id: "overview", label: "Overview", href: "/dashboard/admin/overview", icon: ClipboardList },
+  { id: "create", label: "Create item", href: "/dashboard/admin/create", icon: PlusCircle },
+  { id: "records", label: "Records", href: "/dashboard/admin/records", icon: Database },
+  { id: "reports", label: "Users", href: "/dashboard/admin/reports", icon: BarChart3 },
+  { id: "profile", label: "Profile", href: "/dashboard/admin/profile", icon: UserCircle },
 ]
 
-const role2NavItems = [
-  { id: "overview", label: "Overview", href: "/dashboard/role2/overview", icon: ClipboardList },
-  { id: "entries", label: "Entries", href: "/dashboard/role2/entries", icon: PlusCircle },
-  { id: "reviews", label: "Reviews", href: "/dashboard/role2/reviews", icon: Database },
-  { id: "profile", label: "Profile", href: "/dashboard/role2/profile", icon: UserCircle },
-  { id: "notifications", label: "Notifications", href: "/dashboard/role2/notifications", icon: Bell },
+const inspectorNavItems = [
+  { id: "overview", label: "Overview", href: "/dashboard/inspector/overview", icon: ClipboardList },
+  { id: "profile", label: "Profile", href: "/dashboard/inspector/profile", icon: UserCircle },
+]
+
+const userNavItems = [
+  { id: "overview", label: "Overview", href: "/dashboard/user/overview", icon: ClipboardList },
+  { id: "entries", label: "Entries", href: "/dashboard/user/entries", icon: PlusCircle },
+  { id: "reviews", label: "Reviews", href: "/dashboard/user/reviews", icon: Database },
+  { id: "profile", label: "Profile", href: "/dashboard/user/profile", icon: UserCircle },
+  { id: "notifications", label: "Notifications", href: "/dashboard/user/notifications", icon: Bell },
 ]
 
 const navByRole = {
-  ROLE1: role1NavItems,
-  ROLE2: role2NavItems,
+  ADMIN: adminNavItems,
+  INSPECTOR: inspectorNavItems,
+  USER: userNavItems,
 }
 
 export function RoleDashboardLayout({

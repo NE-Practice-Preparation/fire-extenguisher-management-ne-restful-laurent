@@ -8,9 +8,10 @@ import { Bell, LogOut, Menu, User } from "lucide-react"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { PageHeaderProvider, usePageHeader } from "@/lib/context/page-header-context"
-import { clearAuth, dashboardPathForRole, getSession } from "@/lib/auth"
+import { clearAuth, dashboardPathForRole, getSession, roleLabel } from "@/lib/auth"
 import { AuthUser, Role } from "@/lib/types"
 import { AppLoader } from "@/components/ui/app-loader"
+import { ConfirmLogoutModal } from "@/components/modals/confirm-logout-modal"
 
 type NavItem = {
   id: string
@@ -36,6 +37,7 @@ export function DashboardShell({
   const [user, setUser] = React.useState<AuthUser | null>(null)
   const [ready, setReady] = React.useState(false)
   const [mobileOpen, setMobileOpen] = React.useState(false)
+  const [logoutOpen, setLogoutOpen] = React.useState(false)
 
   React.useEffect(() => {
     const session = getSession()
@@ -54,7 +56,12 @@ export function DashboardShell({
     setReady(true)
   }, [role, router])
 
-  const logout = React.useCallback(() => {
+  const requestLogout = React.useCallback(() => {
+    setLogoutOpen(true)
+  }, [])
+
+  const confirmLogout = React.useCallback(() => {
+    setLogoutOpen(false)
     clearAuth()
     router.replace("/auth/login")
   }, [router])
@@ -74,7 +81,7 @@ export function DashboardShell({
               onActiveChange={onActiveChange}
               role={role}
               user={user}
-              onLogout={logout}
+              onLogout={requestLogout}
             />
           </aside>
 
@@ -96,7 +103,7 @@ export function DashboardShell({
                   }}
                   role={role}
                   user={user}
-                  onLogout={logout}
+                  onLogout={requestLogout}
                 />
               </aside>
             </div>
@@ -108,11 +115,17 @@ export function DashboardShell({
               onOpenMobile={() => setMobileOpen(true)}
               role={role}
               user={user}
-              onLogout={logout}
+              onLogout={requestLogout}
             />
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 md:px-6">{children}</div>
           </section>
         </div>
+
+        <ConfirmLogoutModal
+          isOpen={logoutOpen}
+          onCancel={() => setLogoutOpen(false)}
+          onConfirm={confirmLogout}
+        />
       </main>
     </PageHeaderProvider>
   )
@@ -137,16 +150,16 @@ function SidebarNav({
     <div className="flex h-full flex-col">
       <div className="mb-8 flex items-center gap-3 px-2">
         <Image
-          src="/car_logo.png"
-          alt="Restful Template logo"
-          width={36}
-          height={36}
-          className="rounded-xl object-contain"
+          src="/fire-ext-logo.png"
+          alt="Fire Extinguisher Management logo"
+          width={56}
+          height={56}
+          className="size-14 rounded-xl object-contain"
         />
         <div>
-          <p className="text-sm font-bold text-[#101828]">Restful Template</p>
+          <p className="text-sm font-bold text-[#101828]">Fire Extinguisher</p>
           <p className="text-xs text-[#BE123C]">
-            {role === "ROLE1" ? "Role 1" : "Role 2"} Portal
+            {roleLabel(role)} Portal
           </p>
         </div>
       </div>
@@ -242,7 +255,7 @@ function Topbar({
               breadcrumbs?.length
                 ? breadcrumbs
                 : [
-                    { label: role === "ROLE1" ? "Role 1" : "Role 2", href: "#" },
+                    { label: roleLabel(role), href: "#" },
                     { label: activeLabel, href: "#" },
                   ]
             }

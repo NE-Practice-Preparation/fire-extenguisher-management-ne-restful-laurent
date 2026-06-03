@@ -24,8 +24,10 @@ async function bootstrap() {
   app.setGlobalPrefix("api")
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle("Restful Template API")
-    .setDescription("Reusable RESTful API template with authentication and role-based users.")
+    .setTitle("Fire Extinguisher Management API")
+    .setDescription(
+      "REST API for the Fire Extinguisher Management System with JWT authentication and role-based access (ADMIN, INSPECTOR, USER)."
+    )
     .setVersion("1.0")
     .addBearerAuth()
     .build()

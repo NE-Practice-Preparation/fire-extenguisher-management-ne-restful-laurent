@@ -15,11 +15,11 @@ const fontMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Restful Template",
-    template: "%s | Restful Template",
+    default: "Fire Extinguisher Management",
+    template: "%s | Fire Extinguisher Management",
   },
-  description: "Reusable role-based RESTful application template.",
-  applicationName: "Restful Template",
+  description: "Fire Extinguisher Management System.",
+  applicationName: "Fire Extinguisher Management",
 }
 
 export default function RootLayout({

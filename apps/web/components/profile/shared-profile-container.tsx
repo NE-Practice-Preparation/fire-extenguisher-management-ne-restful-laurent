@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Bell, Save, Shield, Upload, User } from "lucide-react"
 
-type UserRole = "applicant" | "super-admin" | "evaluator" | "role1" | "role2"
+type UserRole = "applicant" | "super-admin" | "evaluator" | "admin" | "inspector" | "user"
 
 type SharedProfileContainerProps = {
   role: UserRole
@@ -240,5 +240,13 @@ function roleLabel(role: UserRole) {
     return "Applicant"
   }
 
-  return role === "role1" ? "Role 1" : "Role 2"
+  if (role === "admin") {
+    return "Admin"
+  }
+
+  if (role === "inspector") {
+    return "Inspector"
+  }
+
+  return "User"
 }

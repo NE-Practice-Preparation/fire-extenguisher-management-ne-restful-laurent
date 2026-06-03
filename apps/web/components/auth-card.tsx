@@ -37,7 +37,6 @@ export function AuthCard({ mode }: { mode: AuthMode }) {
             lastName: String(form.get("lastName")),
             email: String(form.get("email")),
             password: String(form.get("password")),
-            role: String(form.get("role")),
           }
         : {
             email: String(form.get("email")),
@@ -89,7 +88,7 @@ export function AuthCard({ mode }: { mode: AuthMode }) {
             <div className="mb-10 flex justify-center">
               <Image
                 src="/fire-ext-logo.png"
-                alt="Restful Template logo"
+                alt="Fire Extinguisher Management logo"
                 width={180}
                 height={120}
                 priority
@@ -98,13 +97,13 @@ export function AuthCard({ mode }: { mode: AuthMode }) {
             </div>
 
             <div className="space-y-2.5 text-center">
-              <h1 className="text-2xl font-bold text-slate-900">Restful Template</h1>
+              <h1 className="text-2xl font-bold text-slate-900">Fire Extinguisher Management</h1>
               <p className="text-sm font-medium text-slate-700">
                 {isSignup ? "Create Your Account" : "Login Into Your Account"}
               </p>
               {isSignup ? (
                 <p className="text-xs text-slate-500">
-                  Enter your details and choose the dashboard role you need.
+                  Enter your details to create a user account.
                 </p>
               ) : (
                 <div className="border border-[#FFE4E6] p-3 text-left" style={controlRadius}>
@@ -185,22 +184,18 @@ export function AuthCard({ mode }: { mode: AuthMode }) {
                     )}
                   </button>
                 </div>
+                {!isSignup ? (
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => router.push("/auth/forgot-password")}
+                      className="text-xs font-medium text-[#BE123C] transition hover:text-[#9F1239]"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                ) : null}
               </div>
-
-            {isSignup ? (
-              <label className="block space-y-1.5 text-sm">
-                <span className="block text-xs font-medium text-slate-700">Role</span>
-                <select
-                  className="h-[42px] w-full rounded-[2px] border border-slate-200 bg-white px-3.5 text-sm text-slate-900 outline-none transition focus:border-[#BE123C] focus:ring-2 focus:ring-[#BE123C]/20"
-                  name="role"
-                  defaultValue="ROLE2"
-                  style={controlRadius}
-                >
-                  <option value="ROLE2">Role 2</option>
-                  <option value="ROLE1">Role 1</option>
-                </select>
-              </label>
-              ) : null}
 
               {error ? (
                 <p className="rounded-[2px] border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -236,7 +231,7 @@ export function AuthCard({ mode }: { mode: AuthMode }) {
       <div className="hidden h-screen overflow-hidden lg:block">
         <Image
           src="/sider.png"
-          alt="Restful Template login banner"
+          alt="Fire Extinguisher Management banner"
           width={480}
           height={768}
           className="h-full w-full object-cover"
