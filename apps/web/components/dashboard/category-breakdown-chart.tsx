@@ -14,7 +14,7 @@ export function CategoryBreakdownChart() {
               className="h-full w-full rounded-full"
               style={{
                 background: `conic-gradient(
-                  #0A77FF 0% 45%,
+                  #BE123C 0% 45%,
                   #59A8FF 45% 70%,
                   #84C3FF 70% 85%,
                   #D1E9FF 85% 95%,

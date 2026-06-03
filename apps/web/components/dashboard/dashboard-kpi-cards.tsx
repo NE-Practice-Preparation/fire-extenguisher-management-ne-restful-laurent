@@ -4,7 +4,7 @@ import * as React from "react"
 import { AlertTriangle, CheckCheck, ClipboardClock, NotepadText } from "lucide-react"
 
 const kpiItems = [
-  { label: "Lorem Items", value: "0", icon: NotepadText, iconColor: "#0A77FF" },
+  { label: "Lorem Items", value: "0", icon: NotepadText, iconColor: "#BE123C" },
   { label: "Pending Items", value: "0", icon: ClipboardClock, iconColor: "#FF8D28" },
   { label: "Completed Items", value: "0", icon: CheckCheck, iconColor: "#34C759" },
   { label: "Flagged Items", value: "0", icon: AlertTriangle, iconColor: "#FF383C" },

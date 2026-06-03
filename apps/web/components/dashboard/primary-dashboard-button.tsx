@@ -16,7 +16,7 @@ export function PrimaryDashboardButton({
     <Link
       href={href}
       className={cn(
-        "inline-flex items-center rounded-lg bg-[#0A77FF] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#006FE6]",
+        "inline-flex items-center rounded-lg bg-[#BE123C] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#9F1239]",
         className
       )}
     >

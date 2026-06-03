@@ -49,7 +49,7 @@ export function RecentRecordsTable() {
               placeholder="Search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              className="w-full rounded-lg border border-slate-100 bg-white py-3 pl-10 pr-4 text-sm transition-all focus:outline-none focus:ring-1 focus:ring-[#0A77FF]"
+              className="w-full rounded-lg border border-slate-100 bg-white py-3 pl-10 pr-4 text-sm transition-all focus:outline-none focus:ring-1 focus:ring-[#BE123C]"
               type="text"
             />
           </div>
@@ -86,7 +86,7 @@ export function RecentRecordsTable() {
                 <th className="w-10 py-4 pl-6 pr-2 text-right">
                   <input
                     type="checkbox"
-                    className="h-4 w-4 cursor-pointer rounded-lg border-[#D0D5DD] text-[#0A77FF] focus:ring-[#0A77FF]"
+                    className="h-4 w-4 cursor-pointer rounded-lg border-[#D0D5DD] text-[#BE123C] focus:ring-[#BE123C]"
                   />
                 </th>
 
@@ -123,7 +123,7 @@ export function RecentRecordsTable() {
                   <td className="py-4 pl-6 pr-2 text-right">
                     <input
                       type="checkbox"
-                      className="h-4 w-4 cursor-pointer rounded-lg border-[#D0D5DD] text-[#0A77FF] focus:ring-[#0A77FF]"
+                      className="h-4 w-4 cursor-pointer rounded-lg border-[#D0D5DD] text-[#BE123C] focus:ring-[#BE123C]"
                     />
                   </td>
 
@@ -176,7 +176,7 @@ export function RecentRecordsTable() {
 
                   <td className="py-4 pl-2 pr-6">
                     <div className="flex items-start gap-4">
-                      <Eye className="h-4 w-4 cursor-pointer text-slate-400 transition-colors hover:text-[#0A77FF]" />
+                      <Eye className="h-4 w-4 cursor-pointer text-slate-400 transition-colors hover:text-[#BE123C]" />
                       <Trash2 className="h-4 w-4 cursor-pointer text-slate-400 transition-colors hover:text-red-500" />
                     </div>
                   </td>

@@ -30,7 +30,7 @@ export function CreateItemPanel() {
         <Field name="category" label="Category" placeholder="Dolor sit amet" />
         <Field name="amount" label="Amount" placeholder="0" type="number" />
         <div className="flex items-end">
-          <Button className="h-10 w-full rounded-lg bg-[#0A77FF] text-white hover:bg-[#006BE6]">
+          <Button className="h-10 w-full rounded-lg bg-[#BE123C] text-white hover:bg-[#9F1239]">
             <PlusCircle className="size-4" />
             Save item
           </Button>
@@ -190,7 +190,7 @@ export function ReportsPanel() {
               value: users.length,
               detail: "Registered accounts",
               icon: Users,
-              iconColor: "#0A77FF",
+              iconColor: "#BE123C",
             },
             {
               label: "Role 1 users",
@@ -265,7 +265,7 @@ export function ReportsPanel() {
                         type="button"
                         onClick={() => setSelectedEmailUser(user)}
                         disabled={emailingUserId === user.id}
-                        className="mr-1 inline-flex size-9 items-center justify-center rounded-lg text-[#0088FF] transition-colors hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="mr-1 inline-flex size-9 items-center justify-center rounded-lg text-[#BE123C] transition-colors hover:bg-[#FFF1F2] disabled:cursor-not-allowed disabled:opacity-60"
                         aria-label={`Send email to ${user.firstName} ${user.lastName}`}
                       >
                         {emailingUserId === user.id ? (
@@ -343,7 +343,7 @@ function ConfirmEmailModal({
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 p-4">
       <div className="w-full max-w-md rounded-lg bg-white shadow-xl">
         <div className="flex items-start gap-3 border-b border-slate-100 p-5">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-[#0088FF]">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#FFF1F2] text-[#BE123C]">
             <Mail className="size-5" />
           </div>
           <div>
@@ -367,7 +367,7 @@ function ConfirmEmailModal({
             type="button"
             onClick={onConfirm}
             disabled={sending}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#0088FF] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0077EE] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#BE123C] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#9F1239] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {sending ? <Loader2 className="size-4 animate-spin" /> : <Mail className="size-4" />}
             Send email

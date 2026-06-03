@@ -57,7 +57,7 @@ export function SharedProfileContainer({
               className={cn(
                 "flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition-colors",
                 selected
-                  ? "bg-[#F9FAFB] text-[#0088FF]"
+                  ? "bg-[#F9FAFB] text-[#BE123C]"
                   : "text-[#353E49] hover:bg-slate-50"
               )}
             >
@@ -108,7 +108,7 @@ export function SharedProfileContainer({
             <div className="flex justify-end pt-6">
               <button
                 type="button"
-                className="flex items-center gap-2 rounded-lg bg-[#0088FF] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-600 active:bg-blue-700"
+                className="flex items-center gap-2 rounded-lg bg-[#BE123C] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#9F1239] active:bg-[#881337]"
               >
                 <Save className="h-4 w-4" />
                 Save Changes
@@ -194,7 +194,7 @@ function ProfileInput({
         placeholder={placeholder}
         readOnly={readOnly}
         className={cn(
-          "h-10 w-full rounded-lg border border-[#D0D5DD] px-3 text-sm text-[#101828] transition-all focus:border-[#0088FF] focus:outline-none focus:ring-1 focus:ring-[#0088FF]",
+          "h-10 w-full rounded-lg border border-[#D0D5DD] px-3 text-sm text-[#101828] transition-all focus:border-[#BE123C] focus:outline-none focus:ring-1 focus:ring-[#BE123C]",
           readOnly ? "bg-slate-50" : "bg-white"
         )}
       />
@@ -216,7 +216,7 @@ function NotificationOption({
       <input
         type="checkbox"
         defaultChecked={defaultChecked}
-        className="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#0088FF] focus:ring-[#0088FF]"
+        className="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#BE123C] focus:ring-[#BE123C]"
       />
 
       <div>

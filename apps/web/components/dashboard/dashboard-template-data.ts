@@ -44,7 +44,7 @@ export const chartData: Record<string, ChartDataItem[]> = {
 }
 
 export const categoryBreakdown = [
-  { name: "Lorem ipsum category", value: 45, color: "#0A77FF" },
+  { name: "Lorem ipsum category", value: 45, color: "#BE123C" },
   { name: "Dolor sit amet", value: 25, color: "#59A8FF" },
   { name: "Consectetur module", value: 15, color: "#84C3FF" },
   { name: "Adipiscing elit", value: 10, color: "#D1E9FF" },

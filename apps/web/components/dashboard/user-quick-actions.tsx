@@ -7,7 +7,7 @@ const quickActions = [
     description: "Create a new template entry.",
     href: "/dashboard/role2/entries",
     icon: FilePlus,
-    color: "#0A77FF",
+    color: "#BE123C",
   },
   {
     title: "Upload Files",
@@ -50,14 +50,14 @@ export function UserQuickActions() {
             <Link
               key={action.title}
               href={action.href}
-              className="group rounded-lg border border-slate-200 bg-white p-4 transition-all hover:border-[#0A77FF]/40 hover:bg-[#FAFDFF]"
+              className="group rounded-lg border border-slate-200 bg-white p-4 transition-all hover:border-[#BE123C]/40 hover:bg-[#FAFDFF]"
             >
               <div className="mb-4 flex items-center justify-between">
                 <div className="rounded-lg border border-[#EAECF0] bg-white p-2.5">
                   <Icon className="h-5 w-5" style={{ color: action.color }} strokeWidth={1.5} />
                 </div>
 
-                <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-[#0A77FF]" />
+                <ChevronRight className="h-4 w-4 text-slate-300 transition-transform group-hover:translate-x-0.5 group-hover:text-[#BE123C]" />
               </div>
 
               <h3 className="text-sm font-semibold text-[#101828]">{action.title}</h3>

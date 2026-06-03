@@ -88,12 +88,12 @@ export function AuthCard({ mode }: { mode: AuthMode }) {
           <div className="w-full max-w-sm space-y-7" data-auth-card-radius="8px">
             <div className="mb-10 flex justify-center">
               <Image
-                src="/car_logo.png"
+                src="/fire-ext-logo.png"
                 alt="Restful Template logo"
-                width={120}
-                height={80}
+                width={180}
+                height={120}
                 priority
-                className="h-auto w-[120px] object-contain"
+                className="h-auto w-[180px] object-contain"
               />
             </div>
 
@@ -107,13 +107,13 @@ export function AuthCard({ mode }: { mode: AuthMode }) {
                   Enter your details and choose the dashboard role you need.
                 </p>
               ) : (
-                <div className="border border-blue-100 p-3 text-left" style={controlRadius}>
+                <div className="border border-[#FFE4E6] p-3 text-left" style={controlRadius}>
                   <div className="flex gap-2.5 p-1">
                     <div
                       className="flex size-10 shrink-0 items-center justify-center border border-slate-200 bg-white p-1"
                       style={controlRadius}
                     >
-                      <Info className="h-5 w-5 text-blue-600" />
+                      <Info className="h-5 w-5 text-[#BE123C]" />
                     </div>
                     <div className="flex-1 space-y-0.5">
                       <p className="text-xs font-medium text-slate-900">
@@ -169,7 +169,7 @@ export function AuthCard({ mode }: { mode: AuthMode }) {
                     placeholder="Password"
                     required
                     autoComplete={isSignup ? "new-password" : "current-password"}
-                    className="w-full rounded-[2px] border border-slate-200 bg-white px-3.5 py-2.5 pr-9 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#0088FF] focus:ring-2 focus:ring-[#0088FF]/20"
+                    className="w-full rounded-[2px] border border-slate-200 bg-white px-3.5 py-2.5 pr-9 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#BE123C] focus:ring-2 focus:ring-[#BE123C]/20"
                     style={controlRadius}
                   />
                   <button
@@ -191,7 +191,7 @@ export function AuthCard({ mode }: { mode: AuthMode }) {
               <label className="block space-y-1.5 text-sm">
                 <span className="block text-xs font-medium text-slate-700">Role</span>
                 <select
-                  className="h-[42px] w-full rounded-[2px] border border-slate-200 bg-white px-3.5 text-sm text-slate-900 outline-none transition focus:border-[#0088FF] focus:ring-2 focus:ring-[#0088FF]/20"
+                  className="h-[42px] w-full rounded-[2px] border border-slate-200 bg-white px-3.5 text-sm text-slate-900 outline-none transition focus:border-[#BE123C] focus:ring-2 focus:ring-[#BE123C]/20"
                   name="role"
                   defaultValue="ROLE2"
                   style={controlRadius}
@@ -209,7 +209,7 @@ export function AuthCard({ mode }: { mode: AuthMode }) {
               ) : null}
 
               <Button
-                className="h-auto w-full rounded-[2px] bg-[#0088FF] px-5 py-2.5 text-sm text-white transition hover:bg-[#0077EE]"
+                className="h-auto w-full rounded-[2px] bg-[#BE123C] px-5 py-2.5 text-sm text-white transition hover:bg-[#9F1239]"
                 disabled={loading}
                 style={controlRadius}
               >
@@ -221,7 +221,7 @@ export function AuthCard({ mode }: { mode: AuthMode }) {
             <div className="text-center text-sm text-slate-500">
               {isSignup ? "Already have an account? " : "Need an account? "}
               <button
-                className="font-medium text-[#0088FF] transition hover:text-[#0077EE]"
+                className="font-medium text-[#BE123C] transition hover:text-[#9F1239]"
                 onClick={() => router.push(isSignup ? "/auth/login" : "/auth/signup")}
                 type="button"
               >
@@ -235,7 +235,7 @@ export function AuthCard({ mode }: { mode: AuthMode }) {
 
       <div className="hidden h-screen overflow-hidden lg:block">
         <Image
-          src="/sider-banner-login.png"
+          src="/sider.png"
           alt="Restful Template login banner"
           width={480}
           height={768}
@@ -268,7 +268,7 @@ function TextField({
       <div className="relative">
         <input
           id={name}
-          className="w-full rounded-[2px] border border-slate-200 bg-white px-3.5 py-2.5 pr-9 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#0088FF] focus:ring-2 focus:ring-[#0088FF]/20"
+          className="w-full rounded-[2px] border border-slate-200 bg-white px-3.5 py-2.5 pr-9 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#BE123C] focus:ring-2 focus:ring-[#BE123C]/20"
           name={name}
           placeholder={placeholder}
           required

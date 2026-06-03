@@ -145,7 +145,7 @@ function SidebarNav({
         />
         <div>
           <p className="text-sm font-bold text-[#101828]">Restful Template</p>
-          <p className="text-xs text-[#0088FF]">
+          <p className="text-xs text-[#BE123C]">
             {role === "ROLE1" ? "Role 1" : "Role 2"} Portal
           </p>
         </div>
@@ -164,16 +164,16 @@ function SidebarNav({
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-3 text-left text-sm transition-colors",
                 isActive
-                  ? "bg-[#F9FAFB] text-[#0088FF]"
+                  ? "bg-[#F9FAFB] text-[#BE123C]"
                   : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
               )}
             >
               <Icon
-                className={isActive ? "text-[#0088FF]" : "text-[#84888C]"}
+                className={isActive ? "text-[#BE123C]" : "text-[#84888C]"}
                 size={20}
                 strokeWidth={1.5}
               />
-              <span className={isActive ? "text-[#0088FF]" : "text-[#353E49]"}>
+              <span className={isActive ? "text-[#BE123C]" : "text-[#353E49]"}>
                 {item.label}
               </span>
             </button>
@@ -327,7 +327,7 @@ function PortalBreadcrumbs({
           return (
             <li key={`${crumb.label}-${index}`} className="flex items-center gap-2">
               {index > 0 ? <span className="text-[#D0D5DD]">/</span> : null}
-              <span className={isLast ? "text-[#0088FF]" : "text-[#667085]"}>
+              <span className={isLast ? "text-[#BE123C]" : "text-[#667085]"}>
                 {crumb.label}
               </span>
             </li>
@@ -343,7 +343,7 @@ export function MetricCard({
   value,
   detail,
   icon: Icon,
-  iconColor = "#0088FF",
+  iconColor = "#BE123C",
 }: {
   label: string
   value: React.ReactNode
@@ -428,7 +428,7 @@ export function Field({
     <label className="block text-sm">
       <span className="mb-1.5 block text-xs font-medium text-slate-700">{label}</span>
       <input
-        className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#0088FF] focus:ring-2 focus:ring-[#0088FF]/20"
+        className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#BE123C] focus:ring-2 focus:ring-[#BE123C]/20"
         name={name}
         placeholder={placeholder}
         required={required}

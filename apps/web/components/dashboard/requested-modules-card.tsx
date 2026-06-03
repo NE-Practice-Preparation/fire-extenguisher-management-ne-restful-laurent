@@ -38,7 +38,7 @@ export function RequestedModulesCard() {
 
                 <div className="h-2 w-full overflow-hidden rounded-full border border-slate-100 bg-slate-50">
                   <div
-                    className="h-full rounded-full bg-[#0A77FF] transition-all duration-1000"
+                    className="h-full rounded-full bg-[#BE123C] transition-all duration-1000"
                     style={{ width: `${(module.percentage / 12) * 100}%` }}
                   />
                 </div>

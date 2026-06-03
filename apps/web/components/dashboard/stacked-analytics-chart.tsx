@@ -58,7 +58,7 @@ export function StackedAnalyticsChart({ data }: { data: Record<string, ChartData
         <div className="flex items-center gap-4 text-xs font-medium text-slate-500">
           <LegendDot color="#E0EFFF" label="Pending" />
           <LegendDot color="#59A8FF" label="Approved" />
-          <LegendDot color="#0A77FF" label="Rejected" />
+          <LegendDot color="#BE123C" label="Rejected" />
         </div>
       </div>
 
@@ -105,7 +105,7 @@ export function StackedAnalyticsChart({ data }: { data: Record<string, ChartData
                         </span>
                       </p>
 
-                      <TooltipRow color="#0A77FF" label="Rejected" value={item.rejected} />
+                      <TooltipRow color="#BE123C" label="Rejected" value={item.rejected} />
                       <TooltipRow color="#59A8FF" label="Approved" value={item.approved} />
                       <TooltipRow color="#E0EFFF" label="Pending" value={item.pending} />
 
@@ -134,7 +134,7 @@ export function StackedAnalyticsChart({ data }: { data: Record<string, ChartData
                       }}
                     />
                     <div
-                      className="absolute inset-x-0 bottom-0 rounded-t-[6px] bg-[#0A77FF] transition-all duration-500"
+                      className="absolute inset-x-0 bottom-0 rounded-t-[6px] bg-[#BE123C] transition-all duration-500"
                       style={{ height: `${(item.rejected / maxValue) * 100}%` }}
                     />
                   </div>
@@ -151,7 +151,7 @@ export function StackedAnalyticsChart({ data }: { data: Record<string, ChartData
 
       <div className="mt-8 flex items-center justify-between border-t border-slate-100 bg-slate-50/30 px-6 py-4">
         <span className="text-xs font-medium text-slate-400">Data graph</span>
-        <button className="flex items-center gap-1.5 text-xs font-medium text-[#0A77FF] hover:underline">
+        <button className="flex items-center gap-1.5 text-xs font-medium text-[#BE123C] hover:underline">
           Open
           <ExternalLink className="h-3.5 w-3.5" strokeWidth={2} />
         </button>

@@ -6,7 +6,7 @@ export function DotPatternBackground({ children }: { children: ReactNode }) {
       <div
         className="absolute inset-x-0 top-0 h-[60vh] -z-10"
         style={{
-          backgroundImage: "radial-gradient(circle, rgba(148, 163, 184, 0.8) 1.2px, transparent 1.2px)",
+          backgroundImage: "radial-gradient(circle, rgba(190, 18, 60, 0.4) 1.2px, transparent 1.2px)",
           backgroundSize: "24px 24px",
           maskImage:
             "radial-gradient(ellipse 85% 65% at 50% 0%, black 48%, transparent 100%)",

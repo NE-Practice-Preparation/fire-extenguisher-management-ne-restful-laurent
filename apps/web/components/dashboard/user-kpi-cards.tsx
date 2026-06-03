@@ -4,7 +4,7 @@ import * as React from "react"
 import { AlertTriangle, CheckCircle2, Clock, FileText } from "lucide-react"
 
 const userStats = [
-  { label: "Entries", value: "0", icon: FileText, iconColor: "#0A77FF" },
+  { label: "Entries", value: "0", icon: FileText, iconColor: "#BE123C" },
   { label: "Pending", value: "0", icon: Clock, iconColor: "#FF8D28" },
   { label: "Approved", value: "0", icon: CheckCircle2, iconColor: "#34C759" },
   { label: "Rejected", value: "0", icon: AlertTriangle, iconColor: "#FF383C" },

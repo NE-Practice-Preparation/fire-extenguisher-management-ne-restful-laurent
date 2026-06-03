@@ -19,7 +19,7 @@ export default function ModalTestPage() {
       <div className="flex gap-4">
         <button 
           onClick={() => setIsFullOpen(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          className="px-4 py-2 bg-[#BE123C] text-white rounded hover:bg-[#9F1239] transition-colors"
         >
           Open Full Modal
         </button>

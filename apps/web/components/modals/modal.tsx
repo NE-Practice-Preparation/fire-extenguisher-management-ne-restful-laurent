@@ -70,7 +70,7 @@ export function Modal({
         <div className="flex items-start justify-between p-6 border-b border-slate-100">
           <div className="flex items-start gap-4">
             <div className="h-10 w-13 mt-2 rounded-lg border border-slate-100 flex items-center justify-center shrink-0">
-              <UserPlus className="h-5 w-5 text-[#0A77FF]" />
+              <UserPlus className="h-5 w-5 text-[#BE123C]" />
             </div>
             <div>
               <h3 className="text-lg text-[#323539] font-medium">{title || defaultTitle}</h3>
@@ -137,7 +137,7 @@ export function Modal({
                     id="email"
                     placeholder="Enter his/her email" 
                     required
-                    className="w-full pl-4 pr-12 py-3 bg-white border mt-2 border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0A77FF]/10 focus:border-[#0A77FF] transition-all" 
+                    className="w-full pl-4 pr-12 py-3 bg-white border mt-2 border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#BE123C]/10 focus:border-[#BE123C] transition-all" 
                     type="email" 
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -169,7 +169,7 @@ export function Modal({
             </button>
             <button 
               type="submit" 
-              className="flex-1 py-2.5 text-sm font-medium cursor-pointer text-white bg-[#0A77FF] rounded-lg hover:bg-[#0966ff] transition-colors shadow-sm active:scale-[0.98]"
+              className="flex-1 py-2.5 text-sm font-medium cursor-pointer text-white bg-[#BE123C] rounded-lg hover:bg-[#9F1239] transition-colors shadow-sm active:scale-[0.98]"
             >
               Invite
             </button>
