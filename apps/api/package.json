@@ -4,10 +4,10 @@
   "type": "commonjs",
   "private": true,
   "scripts": {
-    "build": "pnpm exec nest build",
-    "dev": "pnpm exec nest start --watch",
-    "start": "node dist/main.js",
-    "start:prod": "node dist/main.js",
+    "build": "node init && pnpm exec nest build",
+    "dev": "node init && pnpm exec nest start --watch",
+    "start": "node init && node dist/main.js",
+    "start:prod": "node init && node dist/main.js",
     "lint": "eslint",
     "format": "prettier --write \"src/**/*.ts\"",
     "typecheck": "tsc --noEmit"

@@ -1,4 +1,9 @@
-import { Injectable, ServiceUnavailableException } from "@nestjs/common"
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  ServiceUnavailableException,
+} from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { createTransport } from "nodemailer"
 import type SMTPTransport from "nodemailer/lib/smtp-transport"
@@ -14,38 +19,68 @@ type SendTemplateEmailInput = {
 }
 
 @Injectable()
-export class MailService {
+export class MailService implements OnModuleInit {
+  private readonly logger = new Logger(MailService.name)
+
   constructor(private readonly config: ConfigService) {}
 
-  async sendTemplateEmail(input: SendTemplateEmailInput) {
-    const transportOptions: SMTPTransport.Options & { family?: number } = {
-      host: this.required("SMTP_HOST"),
-      port: Number(this.read("SMTP_PORT") || "587"),
-      secure: this.read("SMTP_SECURE") === "true",
-      family: Number(this.read("SMTP_FAMILY") || "4"),
-      auth: {
-        user: this.required("SMTP_USER"),
-        pass: this.required("SMTP_PASS").replace(/\s+/g, ""),
-      },
+  async onModuleInit() {
+    try {
+      await this.createTransport().verify()
+      this.logger.log(`SMTP ready via ${this.required("SMTP_HOST")} as ${this.required("SMTP_USER")}`)
+    } catch (error) {
+      this.logger.error(`SMTP is not working: ${this.errorMessage(error)}`)
     }
+  }
 
-    const transporter = createTransport(transportOptions)
-
+  async sendTemplateEmail(input: SendTemplateEmailInput) {
+    const transporter = this.createTransport()
     const from = this.read("SMTP_FROM") || this.required("SMTP_USER")
 
-    await transporter.sendMail({
-      from,
-      to: input.to,
-      subject: input.subject,
-      text: `${input.message}\n\n${input.actionUrl ?? ""}`.trim(),
-      html: renderGenericEmailTemplate(input),
-    })
+    try {
+      const info = await transporter.sendMail({
+        from,
+        to: input.to,
+        subject: input.subject,
+        text: `${input.message}\n\n${input.actionUrl ?? ""}`.trim(),
+        html: renderGenericEmailTemplate(input),
+      })
 
-    return { sent: true }
+      this.logger.log(`Email sent to ${input.to} (${info.messageId ?? "no-id"})`)
+      return { sent: true }
+    } catch (error) {
+      this.logger.error(`Email to ${input.to} failed: ${this.errorMessage(error)}`)
+      throw new ServiceUnavailableException(`Email was not sent: ${this.errorMessage(error)}`)
+    }
+  }
+
+  private createTransport() {
+    const host = this.required("SMTP_HOST")
+    const user = this.required("SMTP_USER")
+    const pass = this.required("SMTP_PASS").replace(/\s+/g, "")
+    const port = Number(this.read("SMTP_PORT") || "587")
+    const secure = this.read("SMTP_SECURE") === "true"
+
+    const options: SMTPTransport.Options = host.includes("gmail.com")
+      ? {
+          service: "gmail",
+          auth: { user, pass },
+        }
+      : {
+          host,
+          port,
+          secure,
+          auth: { user, pass },
+          requireTLS: !secure,
+        }
+
+    return createTransport(options)
   }
 
   private read(key: string) {
-    return this.config.get<string>(key)?.trim().replace(/^["']|["']$/g, "") ?? ""
+    return (this.config.get<string>(key) ?? process.env[key] ?? "")
+      .trim()
+      .replace(/^["']|["']$/g, "")
   }
 
   private required(key: string) {
@@ -56,6 +91,14 @@ export class MailService {
     }
 
     return value
+  }
+
+  private errorMessage(error: unknown) {
+    if (error && typeof error === "object") {
+      const smtpError = error as { message?: string; response?: string; code?: string }
+      return [smtpError.code, smtpError.response, smtpError.message].filter(Boolean).join(" | ")
+    }
+    return String(error)
   }
 }
 
@@ -107,7 +150,7 @@ function renderGenericEmailTemplate({
             }
             <tr>
               <td style="padding:24px 28px 28px;">
-                <p style="margin:0;font-size:12px;line-height:1.6;color:#98a2b3;">This is a generic template message. Configure the copy and sender details for your project before production use.</p>
+                <p style="margin:0;font-size:12px;line-height:1.6;color:#98a2b3;">If you did not expect this email, you can ignore it.</p>
               </td>
             </tr>
           </table>
