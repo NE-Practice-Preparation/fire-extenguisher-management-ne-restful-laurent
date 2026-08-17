@@ -9,6 +9,7 @@
     "format": "turbo format",
     "typecheck": "turbo typecheck",
     "generate": "pnpm --filter @workspace/db generate",
+    "build:api": "pnpm --filter @workspace/db build && pnpm --filter api build",
     "db:migrate:dev": "prisma migrate dev --schema packages/database/prisma/schema.prisma",
     "db:migrate:deploy": "prisma migrate deploy --schema packages/database/prisma/schema.prisma",
     "db:push": "prisma db push --schema packages/database/prisma/schema.prisma",
