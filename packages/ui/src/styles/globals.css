@@ -48,9 +48,12 @@
     --radius-3xl: calc(var(--radius) + 0.75rem);
     --radius-4xl: calc(var(--radius) + 1rem);
     --font-sans: var(--font-sans);
+    --font-mono: var(--font-mono);
 }
 
 :root {
+    --font-sans: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     --background: #f8fafc;
     --foreground: #0f172a;
     --card: oklch(1 0 0);
