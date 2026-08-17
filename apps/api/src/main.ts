@@ -5,15 +5,54 @@ import { ValidationPipe } from "@nestjs/common"
 
 import { AppModule } from "./app.module"
 
+function sanitizeEnvValue(value?: string) {
+  return value?.trim().replace(/^["']|["']$/g, "").replace(/\/$/, "") ?? ""
+}
+
+function sanitizeDatabaseUrl() {
+  const raw = process.env.DATABASE_URL
+  if (!raw) return
+  process.env.DATABASE_URL = sanitizeEnvValue(raw)
+}
+
+function allowedOrigins() {
+  const fromEnv = sanitizeEnvValue(process.env.WEB_ORIGIN)
+    .split(",")
+    .map((origin) => sanitizeEnvValue(origin))
+    .filter(Boolean)
+
+  return [
+    ...new Set([
+      ...fromEnv,
+      "http://localhost:3000",
+      "https://fms-6.vercel.app",
+    ]),
+  ]
+}
+
 async function bootstrap() {
+  sanitizeDatabaseUrl()
   const app = await NestFactory.create(AppModule)
   const port = process.env.PORT ?? 3001
+  const origins = allowedOrigins()
 
   app.enableCors({
-    origin: process.env.WEB_ORIGIN ?? "http://localhost:3000",
+    origin: (origin, callback) => {
+      if (!origin || origins.includes(origin)) {
+        callback(null, true)
+        return
+      }
+      callback(new Error(`CORS blocked for origin: ${origin}`))
+    },
     credentials: true,
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
-  app.use(helmet())
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+    })
+  )
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
