@@ -25,7 +25,7 @@ export class MailService {
       family: Number(this.read("SMTP_FAMILY") || "4"),
       auth: {
         user: this.required("SMTP_USER"),
-        pass: this.required("SMTP_PASS"),
+        pass: this.required("SMTP_PASS").replace(/\s+/g, ""),
       },
     }
 
