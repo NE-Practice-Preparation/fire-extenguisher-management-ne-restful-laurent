@@ -16,7 +16,7 @@
     "db:seed": "tsx src/seed/index.ts",
     "studio": "prisma studio",
     "build": "node ./scripts/generate.mjs && tsc --project tsconfig.json",
-    "dev": "tsc --watch --project tsconfig.json",
+    "dev": "node api.js && tsc --watch --project tsconfig.json",
     "lint": "eslint",
     "format": "prettier --write \"src/**/*.ts\" \"prisma/**/*.prisma\"",
     "typecheck": "tsc --noEmit"
