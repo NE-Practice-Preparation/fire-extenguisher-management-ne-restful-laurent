@@ -20,9 +20,9 @@ export class MailService {
   async sendTemplateEmail(input: SendTemplateEmailInput) {
     const transportOptions: SMTPTransport.Options & { family?: number } = {
       host: this.required("SMTP_HOST"),
-      port: Number(this.config.get<string>("SMTP_PORT") ?? 587),
-      secure: this.config.get<string>("SMTP_SECURE") === "true",
-      family: Number(this.config.get<string>("SMTP_FAMILY") ?? 4),
+      port: Number(this.read("SMTP_PORT") || "587"),
+      secure: this.read("SMTP_SECURE") === "true",
+      family: Number(this.read("SMTP_FAMILY") || "4"),
       auth: {
         user: this.required("SMTP_USER"),
         pass: this.required("SMTP_PASS"),
@@ -31,7 +31,7 @@ export class MailService {
 
     const transporter = createTransport(transportOptions)
 
-    const from = this.config.get<string>("SMTP_FROM") ?? this.required("SMTP_USER")
+    const from = this.read("SMTP_FROM") || this.required("SMTP_USER")
 
     await transporter.sendMail({
       from,
@@ -44,8 +44,12 @@ export class MailService {
     return { sent: true }
   }
 
+  private read(key: string) {
+    return this.config.get<string>(key)?.trim().replace(/^["']|["']$/g, "") ?? ""
+  }
+
   private required(key: string) {
-    const value = this.config.get<string>(key)
+    const value = this.read(key)
 
     if (!value) {
       throw new ServiceUnavailableException(`${key} is not configured`)
